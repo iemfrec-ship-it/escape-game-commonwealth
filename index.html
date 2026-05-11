@@ -628,6 +628,7 @@ input[type=text]::placeholder { color: var(--text3); }
     <div class="lives" id="lives-hud"></div>
     <div id="streak-hud" style="display:none"></div>
     <div class="prog-wrap" style="flex:1"><div class="prog-fill" id="q-prog-fill" style="width:0%"></div></div>
+    <div id="g-attempt-badge" style="display:none;background:rgba(255,209,102,0.12);border:1px solid rgba(255,209,102,0.25);border-radius:99px;padding:4px 9px;font-size:11px;font-weight:600;color:var(--gold);white-space:nowrap"></div>
     <div class="hud-score" id="g-score">0</div>
     <div class="hud-timer" id="g-timer">25</div>
   </div>
@@ -802,6 +803,62 @@ function loadSessionCodeDisplay() {
   displaySessionCode(code);
 }
 
+// ===================== QUESTION SET LOGIC =====================
+// Each country has 12 questions in ALL_Q.
+// Attempt 1,2,3 → pick a fresh random set of 12 (same pool, different order/subset possible — here all 12, shuffled differently each time).
+// Attempt 4+ → merge all 3 previous shuffled orders, deduplicate by position, re-shuffle globally.
+// Since each country has exactly 12 Qs (= full pool), we just shuffle differently each attempt.
+// We store the 3 first shuffled orders per country so attempt 4+ can remix them.
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildQuestionSet(countryId) {
+  const cid = countryId;
+  if (!S.attemptsByCountry[cid]) S.attemptsByCountry[cid] = { count: 0, sets: [] };
+  const att = S.attemptsByCountry[cid];
+  att.count++;
+
+  const pool = ALL_Q[cid]; // 12 questions
+
+  if (att.count <= 3) {
+    // New shuffle each time (guaranteed different from previous via Fisher-Yates)
+    let newSet;
+    let tries = 0;
+    do {
+      newSet = shuffle(pool);
+      tries++;
+      // Ensure it differs from last set by at least 3 positions
+    } while (tries < 20 && att.sets.length > 0 && countSimilarPositions(newSet, att.sets[att.sets.length-1]) > 9);
+    att.sets.push(newSet.map(q => q)); // store reference
+    return newSet;
+  } else {
+    // Attempt 4+: merge all 3 stored sets, flatten, deduplicate (keep first occurrence), re-shuffle
+    const seen = new Set();
+    const merged = [];
+    for (const s of att.sets) {
+      for (const q of s) {
+        const key = q.q; // question text as unique key
+        if (!seen.has(key)) { seen.add(key); merged.push(q); }
+      }
+    }
+    return shuffle(merged);
+  }
+}
+
+function countSimilarPositions(a, b) {
+  let count = 0;
+  const len = Math.min(a.length, b.length);
+  for (let i = 0; i < len; i++) if (a[i] && b[i] && a[i].q === b[i].q) count++;
+  return count;
+}
+
 // ===================== DATA =====================
 const COUNTRIES = [
   {id:'uk',name:'Royaume-Uni',flag:'🇬🇧',color:'#1e3a5f',accent:'#3b82f6',capital:'Londres',sub:'Europe du Nord · 67 millions d\'habitants',mission:'Ta mission : percer les secrets d\'une nation aux mille traditions. De Big Ben à la Premier League, découvre le pays qui a inventé le monde moderne !'},
@@ -890,7 +947,9 @@ const TOTAL_MAX = 900;
 // ===================== STATE =====================
 let S = {
   studentName:'', studentClass:'', currentCountryIdx:null, countryResults:{}, totalScore:0,
-  qIdx:0, lives:5, streak:0, timerVal:0, timerInt:null, answered:false, firstTry:true
+  attemptsByCountry:{}, // tracks attempt count per country id
+  qIdx:0, lives:5, streak:0, timerVal:0, timerInt:null, answered:false, firstTry:true,
+  currentQSet:[], attemptsByCountry:{}
 };
 
 // ===================== SCREENS =====================
@@ -985,21 +1044,35 @@ function openCountry(idx){
   showScreen('country-intro');
 }
 
-function startCountry(){
+function startCountry(isRetry=false){
   const c=COUNTRIES[S.currentCountryIdx];
+  if (!isRetry) {
+    // Fresh start: reset attempt tracker for this country
+    if (S.attemptsByCountry[c.id]) delete S.attemptsByCountry[c.id];
+  }
   S.qIdx=0; S.lives=5; S.streak=0;
-  S.countryResults[c.id]={score:0,done:false,details:[]};
+  S.currentQSet = buildQuestionSet(c.id);
+  S.countryResults[c.id]={score:0,done:false,details:[],attempt:S.attemptsByCountry[c.id].count};
   showScreen('game'); loadQ();
 }
 
-function retryCountry(){ startCountry(); }
+function retryCountry(){ startCountry(true); }
 
 // ===================== GAME =====================
 function loadQ(){
   if(S.qIdx>=12){endCountry();return;}
   S.answered=false; S.firstTry=true;
   const c=COUNTRIES[S.currentCountryIdx];
-  const q=ALL_Q[c.id][S.qIdx];
+  const q=S.currentQSet[S.qIdx];
+  // Update attempt badge
+  const attBadge=document.getElementById('g-attempt-badge');
+  if(attBadge&&S.attemptsByCountry[c.id]){
+    const attN=S.attemptsByCountry[c.id].count;
+    if(attN>1){
+      attBadge.style.display='inline-flex';
+      attBadge.textContent = attN<=3 ? '🎲 Set '+attN+'/3' : '🔀 Remix #'+(attN-3);
+    } else { attBadge.style.display='none'; }
+  }
   const cmap={geo:'tag-geo',hist:'tag-hist',soc:'tag-soc',mon:'tag-mon',nat:'tag-nat'};
   const cname={geo:'Géographie',hist:'Histoire',soc:'Société',mon:'Monuments',nat:'Nature'};
   document.getElementById('g-flag').textContent=c.flag;
@@ -1043,7 +1116,7 @@ function startTimer(){
 function timeUp(){
   if(S.answered) return;
   S.answered=true; S.lives--;
-  const q=ALL_Q[COUNTRIES[S.currentCountryIdx].id][S.qIdx];
+  const q=S.currentQSet[S.qIdx];
   document.querySelectorAll('.choice').forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('reveal');});
   const res=S.countryResults[COUNTRIES[S.currentCountryIdx].id];
   res.details.push({q:q.q,correct:false,pts:0,cat:q.c});
@@ -1058,7 +1131,7 @@ function answer(i){
   if(S.answered) return;
   clearInterval(S.timerInt);
   const c=COUNTRIES[S.currentCountryIdx];
-  const q=ALL_Q[c.id][S.qIdx];
+  const q=S.currentQSet[S.qIdx];
   const btns=document.querySelectorAll('.choice');
   btns.forEach(b=>b.disabled=true);
   const res=S.countryResults[c.id];
@@ -1107,7 +1180,16 @@ function nextQ(){ loadQ(); }
 function gameOver(){
   const c=COUNTRIES[S.currentCountryIdx];
   const res=S.countryResults[c.id];
-  document.getElementById('go-msg').textContent='Tu as perdu toutes tes vies sur '+c.name+' avec '+Math.round(res.score)+' pts. Retente ta chance !';
+  const att = S.attemptsByCountry[c.id];
+  const attCount = att ? att.count : 1;
+  let retryMsg = '';
+  if (attCount === 1) retryMsg = 'Essai 1/3 — un nouveau set de questions t\'attend !';
+  else if (attCount === 2) retryMsg = 'Essai 2/3 — encore un nouveau set de questions !';
+  else if (attCount === 3) retryMsg = 'Essai 3/3 — dernier set inédit, accroche-toi !';
+  else retryMsg = 'Essai '+attCount+' — les questions des 3 premiers essais sont remixées !';
+  document.getElementById('go-msg').innerHTML =
+    'Tu as perdu toutes tes vies sur <strong>'+c.name+'</strong> avec <strong>'+Math.round(res.score)+'</strong> pts.<br><br>' +
+    '<span style="color:var(--gold);font-size:13px">🎲 '+retryMsg+'</span>';
   showScreen('game-over');
 }
 
@@ -1164,7 +1246,7 @@ function showFinalScreen(){
   showScreen('final');
 }
 
-function resetAll(){ S={...S,studentName:'',studentClass:'',currentCountryIdx:null,countryResults:{},totalScore:0}; showScreen('home'); }
+function resetAll(){ S={...S,studentName:'',studentClass:'',currentCountryIdx:null,countryResults:{},totalScore:0,attemptsByCountry:{},currentQSet:[]}; showScreen('home'); }
 
 // ===================== SAVE =====================
 function saveProgress(){
