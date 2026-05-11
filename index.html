@@ -689,11 +689,30 @@ input[type=text]::placeholder { color: var(--text3); }
   <div class="dash-title"><span class="dash-icon">📊</span>Tableau de bord professeur</div>
   <div class="session-code-box">
     <div class="session-code-label">🗝️ Code de session élèves — à afficher au tableau</div>
-    <div class="session-code-value" id="session-code-display">——</div>
-    <div class="session-code-hint">Ce code permet aux élèves d'accéder au jeu</div>
-    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap">
-      <button class="btn btn-sm btn-inline btn-primary" style="width:auto" onclick="generateSessionCode()">🔄 Générer un nouveau code</button>
-      <button class="btn btn-sm btn-inline" style="width:auto;font-size:12px" onclick="clearSessionCode()">🗑️ Désactiver</button>
+    <div class="session-code-value" id="session-code-display">1234</div>
+    <div class="session-code-hint">Les élèves saisissent ce code pour accéder au jeu</div>
+    <div id="session-edit-area" style="display:none;margin-top:12px">
+      <div style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap">
+        <input type="text" id="session-code-input"
+          placeholder="Nouveau code (4 chiffres)"
+          maxlength="4"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          style="width:160px;text-align:center;font-size:22px;font-weight:700;
+                 letter-spacing:8px;font-family:Sora,sans-serif;
+                 padding:10px 12px;margin-bottom:0;
+                 background:rgba(255,209,102,0.08);
+                 border:1px solid rgba(255,209,102,0.35);
+                 border-radius:var(--r);color:var(--gold)">
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-inline btn-primary" style="width:auto;margin-bottom:0" onclick="confirmNewCode()">✓ Valider</button>
+          <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0;font-size:12px" onclick="cancelEditCode()">✕ Annuler</button>
+        </div>
+      </div>
+      <div id="session-code-error" style="display:none;font-size:12px;color:#ffaaaa;margin-top:8px;text-align:center"></div>
+    </div>
+    <div id="session-edit-btn-area" style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-sm btn-inline" style="width:auto;font-size:12px;border-color:rgba(255,209,102,0.3);color:var(--gold)" onclick="showEditCode()">✏️ Modifier le code</button>
     </div>
   </div>
   <div class="tab-row">
@@ -754,7 +773,7 @@ function stuCodeKey(d) {
   if (stuCodeBuffer.length === 4) {
     setTimeout(() => {
       const stored = getSessionCode();
-      if (stored && stuCodeBuffer === stored) {
+      if (stuCodeBuffer === stored) {
         stuCodeBuffer = '';
         updatePinDots('scd', 0);
         document.getElementById('stu-code-error').style.display = 'none';
@@ -782,25 +801,65 @@ function updatePinDots(prefix, count) {
 }
 
 // ===================== SESSION CODE MANAGEMENT =====================
+const DEFAULT_SESSION_CODE = '1234';
+
 function getSessionCode() {
-  try { return localStorage.getItem(SESSION_CODE_KEY) || null; } catch(e) { return null; }
+  try { return localStorage.getItem(SESSION_CODE_KEY) || DEFAULT_SESSION_CODE; } catch(e) { return DEFAULT_SESSION_CODE; }
 }
-function generateSessionCode() {
-  const code = String(Math.floor(1000 + Math.random() * 9000));
+
+function setSessionCode(code) {
   try { localStorage.setItem(SESSION_CODE_KEY, code); } catch(e) {}
-  displaySessionCode(code);
 }
-function clearSessionCode() {
-  try { localStorage.removeItem(SESSION_CODE_KEY); } catch(e) {}
-  displaySessionCode(null);
-}
+
 function displaySessionCode(code) {
   const el = document.getElementById('session-code-display');
-  if (el) el.textContent = code || '——';
+  if (el) el.textContent = code || DEFAULT_SESSION_CODE;
 }
+
 function loadSessionCodeDisplay() {
-  const code = getSessionCode();
-  displaySessionCode(code);
+  displaySessionCode(getSessionCode());
+}
+
+// Show inline edit field
+function showEditCode() {
+  document.getElementById('session-edit-area').style.display = 'block';
+  document.getElementById('session-edit-btn-area').style.display = 'none';
+  document.getElementById('session-code-error').style.display = 'none';
+  const inp = document.getElementById('session-code-input');
+  inp.value = '';
+  setTimeout(() => inp.focus(), 80);
+}
+
+function cancelEditCode() {
+  document.getElementById('session-edit-area').style.display = 'none';
+  document.getElementById('session-edit-btn-area').style.display = 'flex';
+  document.getElementById('session-code-input').value = '';
+  document.getElementById('session-code-error').style.display = 'none';
+}
+
+function confirmNewCode() {
+  const inp = document.getElementById('session-code-input');
+  const errEl = document.getElementById('session-code-error');
+  const val = (inp.value || '').trim();
+  errEl.style.display = 'none';
+
+  if (!/^[0-9]{4}$/.test(val)) {
+    errEl.textContent = 'Le code doit être composé de 4 chiffres exactement.';
+    errEl.style.display = 'block';
+    inp.classList.add('shake');
+    setTimeout(() => inp.classList.remove('shake'), 400);
+    return;
+  }
+  setSessionCode(val);
+  displaySessionCode(val);
+  cancelEditCode();
+  // Flash confirmation on the display
+  const disp = document.getElementById('session-code-display');
+  if (disp) {
+    disp.style.transition = 'color 0.2s';
+    disp.style.color = '#2de0a5';
+    setTimeout(() => { disp.style.color = ''; }, 1200);
+  }
 }
 
 // ===================== QUESTION SET LOGIC =====================
