@@ -696,6 +696,60 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 .shake { animation: shake 0.35s ease; }
 
+.rules-section {
+  background: linear-gradient(160deg, rgba(30,20,8,0.85), rgba(20,12,4,0.9));
+  border: 1px solid rgba(160,110,30,0.18);
+  border-left: 3px solid var(--gold2);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.rules-section-title {
+  font-family: 'Special Elite', monospace;
+  font-size: 12px; font-weight: 400;
+  color: var(--gold); letter-spacing: 0.05em;
+  margin-bottom: 6px; text-transform: uppercase;
+}
+.rules-section-body {
+  font-family: 'Crimson Text', serif;
+  font-size: 14px; color: var(--text2);
+  line-height: 1.7;
+}
+.rules-section-body strong { color: var(--text); font-weight: 600; }
+.rules-score-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 4px 0;
+  border-bottom: 1px solid rgba(160,110,30,0.1);
+}
+.rules-score-row:last-child { border-bottom: none; }
+.rules-score-tag {
+  font-family: 'Crimson Text', serif; font-size: 13px; font-style: italic;
+  padding: 1px 8px; border-radius: 4px; flex: 1;
+}
+.rules-score-tag.ok    { color: #9fdcaa; background: rgba(40,100,50,0.2); }
+.rules-score-tag.mid   { color: var(--text2); background: rgba(100,70,20,0.2); }
+.rules-score-tag.bad   { color: #d4908a; background: rgba(100,30,20,0.2); }
+.rules-score-tag.bonus { color: var(--gold); background: rgba(150,100,20,0.2); }
+.rules-score-val {
+  font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
+  color: var(--gold3); white-space: nowrap;
+}
+
+.btn-home-link {
+  background: rgba(40,26,8,0.6);
+  border: 1px solid rgba(160,110,30,0.2);
+  border-radius: 6px; padding: 5px 14px;
+  font-family: 'Special Elite', monospace;
+  font-size: 11px; color: var(--text3);
+  cursor: pointer; transition: all 0.15s;
+  letter-spacing: 0.04em;
+}
+.btn-home-link:hover {
+  border-color: rgba(200,150,40,0.4);
+  color: var(--gold2);
+  background: rgba(55,36,12,0.7);
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: rgba(15,9,2,0.8); } ::-webkit-scrollbar-thumb { background: rgba(140,90,20,0.5); border-radius: 99px; border: 1px solid rgba(180,120,30,0.2); }
 
@@ -817,8 +871,66 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
     <span class="home-badge">🎲 Questions variées</span>
   </div>
 
-  <div style="text-align:center;margin-top:0.75rem">
-    <button class="btn btn-sm btn-inline" style="width:auto;color:var(--text3);border-color:rgba(180,130,40,0.1);font-size:10px;letter-spacing:0.05em;font-family:'Special Elite',monospace" onclick="showScreen('rgpd')">[ RGPD — Protection des données ]</button>
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:0.75rem;flex-wrap:wrap">
+    <button class="btn-home-link" onclick="showScreen('rules')">📜 Règles du jeu</button>
+    <button class="btn-home-link" onclick="showScreen('rgpd')">🔒 RGPD</button>
+  </div>
+</div>
+
+<!-- STUDENT PROGRESS -->
+<div id="screen-student-progress" class="screen">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+      <h2 style="font-family:'Cinzel',serif;font-size:17px;color:var(--gold);letter-spacing:0.04em">📊 Ma progression</h2>
+      <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0;font-family:'Special Elite',monospace;font-size:11px" onclick="exportProgressPDF()">⬇ Télécharger PDF</button>
+    </div>
+    <div id="progress-content"></div>
+    <button class="btn" style="margin-top:0.5rem" onclick="showScreen('map')">← Retour à la carte</button>
+  </div>
+</div>
+
+<!-- RULES -->
+<div id="screen-rules" class="screen">
+  <div class="card">
+    <h2 style="font-family:'Cinzel',serif;font-size:18px;color:var(--gold);margin-bottom:1.25rem;text-align:center;letter-spacing:0.05em">📜 Règles de l'aventure</h2>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🗺️ Le principe</div>
+      <div class="rules-section-body">Tu explores 5 pays du Commonwealth dans l'ordre. Pour débloquer un nouveau pays, tu dois terminer le précédent. Chaque pays comporte <strong>12 questions</strong> sur sa géographie, son histoire, ses monuments et sa société.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">❤️ Les vies</div>
+      <div class="rules-section-body">Tu commences chaque pays avec <strong>5 vies</strong>. Une mauvaise réponse = −1 vie. Si tu perds toutes tes vies, la mission échoue et tu dois recommencer ce pays.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">⏱ Le chrono</div>
+      <div class="rules-section-body">Chaque question doit être répondue en <strong>25 secondes</strong>. Si le temps s'écoule, tu perds une vie et la bonne réponse s'affiche automatiquement.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🏅 Le score</div>
+      <div class="rules-section-body">
+        <div class="rules-score-row"><span class="rules-score-tag ok">Bonne réponse (1er essai)</span><span class="rules-score-val">+15 pts</span></div>
+        <div class="rules-score-row"><span class="rules-score-tag mid">Bonne réponse (2e essai)</span><span class="rules-score-val">+8 pts</span></div>
+        <div class="rules-score-row"><span class="rules-score-tag bad">Mauvaise réponse</span><span class="rules-score-val">−1 vie</span></div>
+        <div class="rules-score-row"><span class="rules-score-tag bonus">Réponse rapide (≥20s restantes)</span><span class="rules-score-val">+5 pts bonus</span></div>
+        <div class="rules-score-row"><span class="rules-score-tag bonus">Série de 3 bonnes réponses</span><span class="rules-score-val">+10 pts bonus</span></div>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🎲 Les questions</div>
+      <div class="rules-section-body">À chaque nouvelle tentative sur un pays, les questions sont <strong>mélangées différemment</strong>. Les 3 premiers essais proposent un ordre inédit. À partir du 4e essai, les questions des essais précédents sont remixées.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🏆 Score maximum</div>
+      <div class="rules-section-body">Le score maximum est de <strong>900 points</strong> (180 pts par pays × 5 pays). Ta médaille finale dépend de ton taux de réussite global.</div>
+    </div>
+
+    <button class="btn" style="margin-top:0.5rem" onclick="showScreen('home')">← Retour à l'accueil</button>
   </div>
 </div>
 
@@ -947,7 +1059,10 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
       <span class="prog-label" id="global-prog-label">0 / 60</span>
     </div>
   </div>
-  <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0" onclick="showScreen('home')">← Accueil</button>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:0.25rem">
+    <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0" onclick="renderProgressContent();showScreen('student-progress')">📊 Ma progression</button>
+    <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0" onclick="showScreen('home')">← Accueil</button>
+  </div>
 </div>
 
 <!-- COUNTRY INTRO -->
@@ -1070,11 +1185,9 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
   </div>
   <div class="tab-row">
     <button class="tab active" id="tab-class" onclick="switchTab('class')">Vue classe</button>
-    <button class="tab" id="tab-detail" onclick="switchTab('detail')">Détail élève</button>
     <button class="tab" id="tab-stats" onclick="switchTab('stats')">Statistiques</button>
   </div>
   <div id="prof-class-view"></div>
-  <div id="prof-detail-view" style="display:none"></div>
   <div id="prof-stats-view" style="display:none"></div>
   <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
     <button class="btn btn-sm btn-inline" onclick="refreshProf()">🔄 Actualiser</button>
@@ -1660,6 +1773,221 @@ function showFinalScreen(){
 
 function resetAll(){ S={...S,studentName:'',studentClass:'',currentCountryIdx:null,countryResults:{},totalScore:0,attemptsByCountry:{},currentQSet:[]}; showScreen('home'); }
 
+// ===================== STUDENT PROGRESS =====================
+function showStudentProgress() {
+  renderProgressContent();
+  showScreen('student-progress');
+}
+
+function renderProgressContent() {
+  const el = document.getElementById('progress-content');
+  if (!el) return;
+
+  const allD = Object.values(S.countryResults||{}).flatMap(r=>r.details||[]);
+  const totalCorrect = allD.filter(d=>d.correct).length;
+  const totalQ = allD.length;
+  const totalPct = totalQ > 0 ? Math.round(totalCorrect/totalQ*100) : 0;
+  const doneCountries = Object.values(S.countryResults||{}).filter(r=>r.done).length;
+
+  let h = '';
+
+  // Header identity
+  h += `<div style="background:linear-gradient(160deg,rgba(40,26,8,0.9),rgba(25,15,4,0.95));border:1px solid rgba(200,150,30,0.25);border-radius:var(--r);padding:12px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:12px">
+    <div style="font-size:28px">🧭</div>
+    <div>
+      <div style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);letter-spacing:2px">${S.studentName}</div>
+      <div style="font-family:'Special Elite',monospace;font-size:11px;color:var(--text3);margin-top:2px">Classe : ${S.studentClass} · ${doneCountries}/5 pays explorés</div>
+    </div>
+    <div style="margin-left:auto;text-align:right">
+      <div style="font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:var(--gold)">${Math.round(S.totalScore||0)}</div>
+      <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3)">/ 900 pts</div>
+    </div>
+  </div>`;
+
+  // Global stats
+  h += `<div class="stat-grid" style="margin-bottom:1rem">
+    <div class="stat-box"><div class="stat-val">${Math.round(S.totalScore||0)}</div><div class="stat-lbl">Points totaux</div></div>
+    <div class="stat-box"><div class="stat-val">${totalCorrect}/${totalQ}</div><div class="stat-lbl">Bonnes réponses</div></div>
+    <div class="stat-box"><div class="stat-val">${totalPct}%</div><div class="stat-lbl">Réussite</div></div>
+  </div>`;
+
+  // Country-by-country table
+  h += `<div class="section-title" style="margin-bottom:8px">Tableau des scores par pays</div>`;
+  h += `<div style="border:1px solid rgba(160,110,30,0.2);border-radius:var(--r);overflow:hidden;margin-bottom:1rem">`;
+
+  // Table header
+  h += `<div style="display:grid;grid-template-columns:28px 1fr 60px 60px 70px;gap:0;background:rgba(40,26,8,0.95);padding:7px 10px;border-bottom:1px solid rgba(160,110,30,0.2)">
+    <div></div>
+    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);letter-spacing:0.04em">PAYS</div>
+    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);text-align:center">RÉPONSES</div>
+    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);text-align:center">TAUX</div>
+    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);text-align:right">POINTS</div>
+  </div>`;
+
+  COUNTRIES.forEach((c,i) => {
+    const r = S.countryResults?.[c.id];
+    const pts = r?.score || 0;
+    const done = r?.done || false;
+    const corr = r?.details?.filter(d=>d.correct).length || 0;
+    const tot  = r?.details?.length || 0;
+    const pct  = tot > 0 ? Math.round(corr/tot*100) : 0;
+    const pctColor = pct>=70 ? '#9fdcaa' : pct>=40 ? 'var(--amber)' : '#d4908a';
+    const statusIcon = done ? '✓' : tot > 0 ? '…' : '—';
+    const statusColor = done ? 'var(--green)' : tot > 0 ? 'var(--amber)' : 'var(--text3)';
+    const bg = i%2===0 ? 'rgba(25,15,5,0.6)' : 'rgba(18,10,3,0.6)';
+
+    h += `<div style="display:grid;grid-template-columns:28px 1fr 60px 60px 70px;gap:0;background:${bg};padding:8px 10px;border-bottom:1px solid rgba(160,110,30,0.08);align-items:center">
+      <div style="font-size:16px">${c.flag}</div>
+      <div>
+        <div style="font-family:'Crimson Text',serif;font-size:14px;color:var(--text)">${c.name}</div>
+        <div style="font-size:9px;color:${statusColor};font-family:'Special Elite',monospace;margin-top:1px">${statusIcon}${done?' Terminé':tot>0?' En cours':' Non commencé'}</div>
+      </div>
+      <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--text2)">${done?corr+'/12':'—'}</div>
+      <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:${done?pctColor:'var(--text3)'}">${done?pct+'%':'—'}</div>
+      <div style="text-align:right;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:${done?'var(--gold)':'var(--text3)'}">${done?Math.round(pts)+' pts':'—'}</div>
+    </div>`;
+  });
+
+  // Total row
+  const maxSoFar = Object.values(S.countryResults||{}).filter(r=>r.done).length * MAX_PER_COUNTRY;
+  h += `<div style="display:grid;grid-template-columns:28px 1fr 60px 60px 70px;gap:0;background:rgba(50,32,8,0.95);padding:8px 10px;border-top:1px solid rgba(200,150,40,0.25);align-items:center">
+    <div></div>
+    <div style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold);letter-spacing:0.04em">TOTAL</div>
+    <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--text2)">${totalCorrect}/${totalQ}</div>
+    <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:${totalPct>=70?'#9fdcaa':totalPct>=40?'var(--amber)':'#d4908a'}">${totalQ>0?totalPct+'%':'—'}</div>
+    <div style="text-align:right;font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:var(--gold)">${Math.round(S.totalScore||0)} pts</div>
+  </div>`;
+
+  h += `</div>`;
+
+  // Progress bars
+  h += `<div class="section-title" style="margin-bottom:8px">Progression visuelle</div>`;
+  const globalPct = Math.round((S.totalScore||0)/TOTAL_MAX*100);
+  h += `<div style="margin-bottom:1rem">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-family:'Special Elite',monospace;font-size:11px;color:var(--text3)">Score global</span>
+      <span style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold)">${globalPct}%</span>
+    </div>
+    <div class="prog-wrap" style="height:10px"><div class="prog-fill" style="width:${globalPct}%"></div></div>
+  </div>`;
+
+  COUNTRIES.forEach(c => {
+    const r = S.countryResults?.[c.id];
+    if (!r || !r.done) return;
+    const p = Math.round((r.score||0)/MAX_PER_COUNTRY*100);
+    h += `<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:13px;font-family:'Crimson Text',serif;color:var(--text2)">${c.flag} ${c.name}</span>
+        <span style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold)">${Math.round(r.score)} pts</span>
+      </div>
+      <div class="prog-wrap"><div class="prog-fill" style="width:${p}%"></div></div>
+    </div>`;
+  });
+
+  el.innerHTML = h;
+}
+
+// ── PDF Export ──────────────────────────────────────────────────────────
+function exportProgressPDF() {
+  const allD = Object.values(S.countryResults||{}).flatMap(r=>r.details||[]);
+  const totalCorrect = allD.filter(d=>d.correct).length;
+  const totalQ = allD.length;
+  const totalPct = totalQ > 0 ? Math.round(totalCorrect/totalQ*100) : 0;
+  const doneCountries = Object.values(S.countryResults||{}).filter(r=>r.done).length;
+  const date = new Date().toLocaleDateString('fr-FR');
+
+  let rows = '';
+  COUNTRIES.forEach(c => {
+    const r = S.countryResults?.[c.id];
+    const pts = r?.score || 0;
+    const done = r?.done || false;
+    const corr = r?.details?.filter(d=>d.correct).length || 0;
+    const tot  = r?.details?.length || 0;
+    const pct  = tot > 0 ? Math.round(corr/tot*100) : 0;
+    rows += `<tr>
+      <td>${c.flag} ${c.name}</td>
+      <td style="text-align:center">${done ? corr+' / 12' : '—'}</td>
+      <td style="text-align:center">${done ? pct+'%' : '—'}</td>
+      <td style="text-align:center;color:${done?'#7a5a10':'#999'};font-weight:${done?'700':'400'}">${done ? Math.round(pts)+' pts' : '—'}</td>
+      <td style="text-align:center">${done ? '✓ Terminé' : tot>0 ? '… En cours' : 'Non commencé'}</td>
+    </tr>`;
+  });
+
+  const medal = totalPct>=80?'🏆':totalPct>=60?'🥇':totalPct>=40?'🥈':'🥉';
+
+  const pdfHTML = `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8">
+<title>Commonwealth Explorer — Résultats ${S.studentName}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; color: #2a1a04; background: #fdf6e3; padding: 32px; }
+  .header { text-align: center; border-bottom: 3px double #8a6010; padding-bottom: 18px; margin-bottom: 22px; }
+  .header h1 { font-size: 26px; letter-spacing: 3px; color: #5a3a08; text-transform: uppercase; }
+  .header .sub { font-size: 13px; color: #8a6010; margin-top: 6px; font-style: italic; }
+  .id-box { background: #f5e8c0; border: 1px solid #c9a830; border-radius: 8px; padding: 12px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+  .id-code { font-size: 22px; font-weight: 700; color: #7a5010; letter-spacing: 4px; }
+  .id-detail { font-size: 13px; color: #6a4808; }
+  .score-banner { background: linear-gradient(135deg, #f5e8c0, #ffe9a0); border: 2px solid #c9a830; border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 22px; }
+  .score-banner .big { font-size: 42px; font-weight: 700; color: #5a3a08; }
+  .score-banner .label { font-size: 13px; color: #8a6010; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 22px; }
+  thead tr { background: #5a3a08; color: #fdf6e3; }
+  thead th { padding: 10px 14px; font-size: 12px; letter-spacing: 0.05em; text-align: left; }
+  tbody tr:nth-child(even) { background: #f5e8c0; }
+  tbody tr:nth-child(odd)  { background: #fdf6e3; }
+  tbody td { padding: 9px 14px; font-size: 13px; border-bottom: 1px solid #ddd; }
+  tfoot tr { background: #f0d890; font-weight: 700; }
+  tfoot td { padding: 10px 14px; font-size: 13px; border-top: 2px solid #c9a830; }
+  .note { font-size: 11px; color: #8a6010; font-style: italic; text-align: center; margin-top: 10px; }
+  .footer { text-align: center; font-size: 11px; color: #aaa; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 12px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🌍 Commonwealth Explorer</h1>
+  <div class="sub">Résultats d'exploration — généré le ${date}</div>
+</div>
+<div class="id-box">
+  <div>
+    <div class="id-code">${S.studentName}</div>
+    <div class="id-detail">Classe : ${S.studentClass}</div>
+  </div>
+  <div style="text-align:right">
+    <div style="font-size:18px">${medal}</div>
+    <div class="id-detail">${doneCountries}/5 pays explorés</div>
+  </div>
+</div>
+<div class="score-banner">
+  <div class="big">${Math.round(S.totalScore||0)} pts</div>
+  <div class="label">sur 900 possibles · ${totalPct}% de réussite · ${totalCorrect}/${totalQ} bonnes réponses</div>
+</div>
+<table>
+  <thead><tr>
+    <th>Pays</th>
+    <th style="text-align:center">Réponses</th>
+    <th style="text-align:center">Taux</th>
+    <th style="text-align:center">Points</th>
+    <th style="text-align:center">Statut</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+  <tfoot><tr>
+    <td>TOTAL</td>
+    <td style="text-align:center">${totalCorrect} / ${totalQ}</td>
+    <td style="text-align:center">${totalQ>0?totalPct+'%':'—'}</td>
+    <td style="text-align:center;color:#5a3a08">${Math.round(S.totalScore||0)} pts</td>
+    <td style="text-align:center">${doneCountries}/5 pays</td>
+  </tr></tfoot>
+</table>
+<div class="note">Document généré depuis Commonwealth Explorer · À remettre au professeur</div>
+<div class="footer">Commonwealth Explorer — Application pédagogique · Données anonymisées</div>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(pdfHTML);
+  win.document.close();
+  setTimeout(() => { win.focus(); win.print(); }, 600);
+}
+
 // ===================== SAVE =====================
 function saveProgress(){
   const key='cw_'+S.studentClass+'_'+S.studentName;
@@ -1697,17 +2025,17 @@ function refreshProf(){
         au:{score:0,done:false,details:[]},ca:{score:0,done:false,details:[]},in:{score:0,done:false,details:[]},nz:{score:0,done:false,details:[]}}}
     ];
   }
+  if(profTab==='detail') profTab='class';
   switchTab(profTab);
 }
 
 function switchTab(t){
   profTab=t;
-  ['class','detail','stats'].forEach(id=>{
+  ['class','stats'].forEach(id=>{
     document.getElementById('tab-'+id).classList.toggle('active',id===t);
     document.getElementById('prof-'+id+'-view').style.display=id===t?'block':'none';
   });
   if(t==='class') renderClass();
-  if(t==='detail') renderDetail();
   if(t==='stats') renderStats();
 }
 
@@ -1742,7 +2070,7 @@ function renderClass(){
 
 function selectStudent(name){
   selectedStudent=profData.find(s=>s.name===name);
-  switchTab('detail');
+  // detail tab removed — no navigation needed
 }
 
 function deleteStudent(name, event) {
@@ -1757,7 +2085,7 @@ function deleteStudent(name, event) {
     profData = profData.filter(s => s.name !== name);
     if (selectedStudent && selectedStudent.name === name) selectedStudent = null;
     renderClass();
-    if (profTab === 'detail') renderDetail();
+  
     return;
   }
   row.innerHTML = `
@@ -1784,8 +2112,8 @@ function confirmDelete(name) {
   // Remove from profData
   profData = profData.filter(s => s.name !== name);
   if (selectedStudent && selectedStudent.name === name) selectedStudent = null;
-  // Go back to class view after delete
-  switchTab('class');
+  renderClass();
+  if(profTab==='stats') renderStats();
 }
 
 function deleteStudentFromDetail(name) {
@@ -1793,69 +2121,6 @@ function deleteStudentFromDetail(name) {
   if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 
-function renderDetail(){
-  const el=document.getElementById('prof-detail-view');
-  if(!selectedStudent){
-    el.innerHTML='<div class="empty-state">Clique sur un élève dans "Vue classe" pour voir son détail.</div>';return;
-  }
-  const s=selectedStudent;
-  const pct=Math.round((s.totalScore||0)/TOTAL_MAX*100);
-  const allD=Object.values(s.countryResults||{}).flatMap(r=>r.details||[]);
-  const correct=allD.filter(d=>d.correct).length;
-  const code=s.name||'??';
-  const classeLabel=s.classe||'—';
-  const initials=code.replace('-','').slice(0,2);
-  let h=`<div class="card">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
-      <div class="avatar" style="width:44px;height:44px;font-size:15px">${initials}</div>
-      <div style="flex:1">
-        <div style="font-size:18px;font-weight:700;font-family:'Cinzel',serif;letter-spacing:2px;color:var(--gold)">${code}</div>
-        <div style="font-size:12px;color:var(--text2)">Classe : ${classeLabel} · ${pct}% de réussite globale</div>
-      </div>
-      <button class="btn-delete" onclick="deleteStudentFromDetail('${s.name}')" title="Supprimer cet élève" style="width:36px;height:36px;font-size:16px">🗑</button>
-    </div>
-    <div id="detail-delete-confirm" style="display:none;margin-bottom:1rem">
-      <div class="delete-confirm">
-        <div class="delete-confirm-msg">⚠️ Supprimer <strong style="color:#ffaaaa;font-family:'Cinzel',serif">${code}</strong> définitivement ?</div>
-        <div class="delete-confirm-btns">
-          <button class="btn-confirm-yes" onclick="confirmDelete('${s.name}')">✓ Supprimer</button>
-          <button class="btn-confirm-no" onclick="document.getElementById('detail-delete-confirm').style.display='none'">✕ Annuler</button>
-        </div>
-      </div>
-    </div>
-    <div class="stat-grid">
-      <div class="stat-box"><div class="stat-val">${Math.round(s.totalScore||0)}</div><div class="stat-lbl">Points</div></div>
-      <div class="stat-box"><div class="stat-val">${correct}/${allD.length}</div><div class="stat-lbl">Réponses justes</div></div>
-      <div class="stat-box"><div class="stat-val">${pct}%</div><div class="stat-lbl">Réussite</div></div>
-    </div>
-    <div class="section-title">Progression par pays :</div>`;
-  COUNTRIES.forEach(c=>{
-    const r=s.countryResults?.[c.id];
-    const pts=r?.score||0; const done=r?.done;
-    const p=Math.round(pts/MAX_PER_COUNTRY*100);
-    const corr=r?.details?.filter(d=>d.correct).length||0;
-    h+=`<div class="cp-row">
-      <span class="cp-flag">${c.flag}</span>
-      <span class="cp-name">${c.name}</span>
-      <div class="cp-bar-wrap"><div class="cp-bar" style="width:${p}%;background:${done?'var(--green)':'#555'}"></div></div>
-      <span class="cp-pts">${done?Math.round(pts)+' pts ('+corr+'/12)':'—'}</span>
-    </div>`;
-  });
-  const catMap={geo:'Géographie',hist:'Histoire',soc:'Société',mon:'Monuments',nat:'Nature'};
-  h+='<div class="section-title">Réussite par thème :</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
-  ['geo','hist','soc','mon','nat'].forEach(cat=>{
-    const catQ=allD.filter(d=>d.cat===cat); if(!catQ.length) return;
-    const catOk=catQ.filter(d=>d.correct).length;
-    const cp=Math.round(catOk/catQ.length*100);
-    const cl=cp>=70?'pct-good':cp>=40?'pct-mid':'pct-bad';
-    h+=`<div class="detail-panel" style="display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:12px;font-weight:500">${catMap[cat]}</span>
-      <span class="${cl}" style="font-size:12px;font-weight:600">${catOk}/${catQ.length} (${cp}%)</span>
-    </div>`;
-  });
-  h+='</div></div>';
-  el.innerHTML=h;
-}
 
 function renderStats(){
   const el=document.getElementById('prof-stats-view');
