@@ -937,13 +937,39 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
 <!-- RGPD -->
 <div id="screen-rgpd" class="screen">
   <div class="card">
-    <h2 style="font-size:16px;margin-bottom:1rem;display:flex;align-items:center;gap:8px;font-family:'Cinzel',serif;color:var(--gold)">🔒 Clause RGPD — Protection des données</h2>
-    <div style="background:rgba(10,6,2,0.6);border-radius:var(--r);padding:1rem;font-size:14px;color:var(--text2);line-height:1.9;margin-bottom:1rem;border-left:2px solid var(--gold2);font-family:'Crimson Text',serif;min-height:120px">
-      <!-- ============================================================ -->
-      <!-- INSÉRER ICI LA CLAUSE RGPD COMPLÈTE DE L'ÉTABLISSEMENT      -->
-      <!-- ============================================================ -->
+    <h2 style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;letter-spacing:0.04em">🔒 Protection des données personnelles</h2>
+
+    <div class="rules-section">
+      <div class="rules-section-title">📌 Outil pédagogique</div>
+      <div class="rules-section-body">Cette application est un outil pédagogique développé pour un usage en classe.</div>
     </div>
-    <button class="btn" onclick="showScreen('home')">← Retour à l'accueil</button>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🖥️ Aucune transmission externe</div>
+      <div class="rules-section-body">Aucune donnée n'est transmise à un serveur externe : toutes les informations (identifiant, réponses, score) restent uniquement dans la mémoire de votre navigateur, le temps de la partie en cours.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🚫 Aucun traceur</div>
+      <div class="rules-section-body">Aucun cookie tiers, aucun traceur publicitaire, aucun appel à une API externe n'est utilisé.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🪪 Données saisies</div>
+      <div class="rules-section-body">Les seules données saisies sont : les deux premières lettres de votre prénom et de votre nom — utilisées uniquement pour générer un identifiant au format <strong style="color:var(--gold);font-family:'Cinzel',serif">XX-YY</strong>, sans jamais collecter votre identité complète — ainsi que vos réponses aux exercices.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🗑️ Effacement automatique</div>
+      <div class="rules-section-body">Ces données ne sont jamais sauvegardées : elles disparaissent automatiquement si vous rechargez ou fermez la page. <strong>Pensez à télécharger votre PDF de résultats avant de quitter l'application.</strong></div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">📄 Le PDF de résultats</div>
+      <div class="rules-section-body">Le PDF généré est créé localement dans votre navigateur ; il n'est envoyé à personne automatiquement. C'est à vous de le transmettre à votre professeur.</div>
+    </div>
+
+    <button class="btn" style="margin-top:0.5rem" onclick="showScreen('home')">← Retour à l'accueil</button>
   </div>
 </div>
 
@@ -985,29 +1011,15 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
   <div class="card">
     <div class="pin-wrap">
       <span class="pin-icon">🗝️</span>
-      <div class="pin-title">Code de session</div>
-      <div class="pin-sub">Entre le code à 4 chiffres<br>donné par ton professeur</div>
-      <div class="pin-dots" id="stu-code-dots">
-        <div class="pin-dot" id="scd-0"></div>
-        <div class="pin-dot" id="scd-1"></div>
-        <div class="pin-dot" id="scd-2"></div>
-        <div class="pin-dot" id="scd-3"></div>
-      </div>
-      <div class="pin-error" id="stu-code-error">Code incorrect. Demande le code à ton professeur.</div>
-      <div class="pin-keypad">
-        <button class="pin-key" onclick="stuCodeKey('1')">1</button>
-        <button class="pin-key" onclick="stuCodeKey('2')">2</button>
-        <button class="pin-key" onclick="stuCodeKey('3')">3</button>
-        <button class="pin-key" onclick="stuCodeKey('4')">4</button>
-        <button class="pin-key" onclick="stuCodeKey('5')">5</button>
-        <button class="pin-key" onclick="stuCodeKey('6')">6</button>
-        <button class="pin-key" onclick="stuCodeKey('7')">7</button>
-        <button class="pin-key" onclick="stuCodeKey('8')">8</button>
-        <button class="pin-key" onclick="stuCodeKey('9')">9</button>
-        <button class="pin-key del" onclick="stuCodeDel()">⌫</button>
-        <button class="pin-key zero" onclick="stuCodeKey('0')">0</button>
-        <button class="pin-key del" onclick="stuCodeClear()">✕</button>
-      </div>
+      <div class="pin-title">Code de mission</div>
+      <div class="pin-sub">Entre le code donné par ton professeur<br>pour accéder à l'aventure</div>
+      <input type="text" id="stu-code-input"
+        placeholder="Code de session…"
+        maxlength="30"
+        style="margin:1rem 0 0.5rem;font-size:18px;letter-spacing:3px;text-align:center;font-family:'Special Elite',monospace"
+        oninput="this.value=this.value" onkeydown="if(event.key==='Enter')checkStuCode()">
+      <div class="pin-error" id="stu-code-error" style="margin-top:8px">Code incorrect. Demande le code à ton professeur.</div>
+      <button class="btn btn-primary" style="margin-top:1rem" onclick="checkStuCode()">▶ Valider le code</button>
     </div>
     <button class="btn" onclick="showScreen('home')">← Retour</button>
   </div>
@@ -1162,10 +1174,9 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
     <div id="session-edit-area" style="display:none;margin-top:12px">
       <div style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap">
         <input type="text" id="session-code-input"
-          placeholder="Nouveau code (4 chiffres)"
+          placeholder="Nouveau code"
           maxlength="4"
-          inputmode="numeric"
-          pattern="[0-9]*"
+          
           style="width:160px;text-align:center;font-size:22px;font-weight:700;
                  letter-spacing:8px;font-family:'Cinzel',serif;
                  padding:10px 12px;margin-bottom:0;
@@ -1179,18 +1190,13 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
       </div>
       <div id="session-code-error" style="display:none;font-size:12px;color:#ffaaaa;margin-top:8px;text-align:center"></div>
     </div>
-    <div id="session-edit-btn-area" style="margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-sm btn-inline" style="width:auto;font-size:12px;border-color:rgba(255,209,102,0.3);color:var(--gold)" onclick="showEditCode()">✏️ Modifier le code</button>
-    </div>
+    <div id="session-edit-btn-area" style="display:none"></div>
   </div>
-  <div class="tab-row">
-    <button class="tab active" id="tab-class" onclick="switchTab('class')">Vue classe</button>
-    <button class="tab" id="tab-stats" onclick="switchTab('stats')">Statistiques</button>
-  </div>
+
   <div id="prof-class-view"></div>
-  <div id="prof-stats-view" style="display:none"></div>
-  <div style="display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap">
-    <button class="btn btn-sm btn-inline" onclick="refreshProf()">🔄 Actualiser</button>
+  <div style="height:1px;background:rgba(160,110,30,0.15);margin:0.25rem 0 0.75rem"></div>
+  <div id="prof-stats-view"></div>
+  <div style="margin-top:1rem">
     <button class="btn btn-sm btn-inline" onclick="showScreen('home')">← Accueil</button>
   </div>
 </div>
@@ -1231,33 +1237,21 @@ function profPinDel() { if (profPinBuffer.length > 0) { profPinBuffer = profPinB
 function profPinClear() { profPinBuffer = ''; updatePinDots('ppd', 0); }
 
 // ===================== STUDENT SESSION CODE =====================
-let stuCodeBuffer = '';
-function stuCodeKey(d) {
-  if (stuCodeBuffer.length >= 4) return;
-  stuCodeBuffer += d;
-  updatePinDots('scd', stuCodeBuffer.length);
-  if (stuCodeBuffer.length === 4) {
-    setTimeout(() => {
-      const stored = getSessionCode();
-      if (stuCodeBuffer === stored) {
-        stuCodeBuffer = '';
-        updatePinDots('scd', 0);
-        document.getElementById('stu-code-error').style.display = 'none';
-        startStudent();
-      } else {
-        document.getElementById('stu-code-error').style.display = 'block';
-        document.getElementById('screen-student-code').querySelector('.pin-wrap').classList.add('shake');
-        setTimeout(() => {
-          document.getElementById('screen-student-code').querySelector('.pin-wrap').classList.remove('shake');
-          stuCodeBuffer = '';
-          updatePinDots('scd', 0);
-        }, 500);
-      }
-    }, 120);
+function checkStuCode() {
+  const errEl = document.getElementById('stu-code-error');
+  const inp = document.getElementById('stu-code-input');
+  const val = (inp.value || '').trim();
+  const stored = getSessionCode();
+  if (val === stored) {
+    errEl.style.display = 'none';
+    inp.value = '';
+    startStudent();
+  } else {
+    errEl.style.display = 'block';
+    inp.classList.add('shake');
+    setTimeout(() => inp.classList.remove('shake'), 400);
   }
 }
-function stuCodeDel() { if (stuCodeBuffer.length > 0) { stuCodeBuffer = stuCodeBuffer.slice(0, -1); updatePinDots('scd', stuCodeBuffer.length); } }
-function stuCodeClear() { stuCodeBuffer = ''; updatePinDots('scd', 0); }
 
 function updatePinDots(prefix, count) {
   for (let i = 0; i < 4; i++) {
@@ -1267,7 +1261,7 @@ function updatePinDots(prefix, count) {
 }
 
 // ===================== SESSION CODE MANAGEMENT =====================
-const DEFAULT_SESSION_CODE = '1234';
+const DEFAULT_SESSION_CODE = 'Commonwealth2627';
 
 function getSessionCode() {
   try { return localStorage.getItem(SESSION_CODE_KEY) || DEFAULT_SESSION_CODE; } catch(e) { return DEFAULT_SESSION_CODE; }
@@ -1309,8 +1303,8 @@ function confirmNewCode() {
   const val = (inp.value || '').trim();
   errEl.style.display = 'none';
 
-  if (!/^[0-9]{4}$/.test(val)) {
-    errEl.textContent = 'Le code doit être composé de 4 chiffres exactement.';
+  if (val.length < 4) {
+    errEl.textContent = 'Le code doit contenir au moins 4 caractères.';
     errEl.style.display = 'block';
     inp.classList.add('shake');
     setTimeout(() => inp.classList.remove('shake'), 400);
@@ -1998,7 +1992,11 @@ function saveProgress(){
 // ===================== PROF =====================
 let profData=[], selectedStudent=null, profTab='class';
 
-function showProf(){ showScreen('prof'); refreshProf(); loadSessionCodeDisplay(); }
+function showProf(){
+  showScreen('prof');
+  loadSessionCodeDisplay();
+  refreshProf();
+}
 window.showProf = showProf;
 
 function refreshProf(){
@@ -2025,18 +2023,14 @@ function refreshProf(){
         au:{score:0,done:false,details:[]},ca:{score:0,done:false,details:[]},in:{score:0,done:false,details:[]},nz:{score:0,done:false,details:[]}}}
     ];
   }
-  if(profTab==='detail') profTab='class';
-  switchTab(profTab);
+  switchTab('class');
 }
 
 function switchTab(t){
   profTab=t;
-  ['class','stats'].forEach(id=>{
-    document.getElementById('tab-'+id).classList.toggle('active',id===t);
-    document.getElementById('prof-'+id+'-view').style.display=id===t?'block':'none';
-  });
-  if(t==='class') renderClass();
-  if(t==='stats') renderStats();
+  // No tabs visible — show both views stacked
+  renderClass();
+  renderStats();
 }
 
 function renderClass(){
