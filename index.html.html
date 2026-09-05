@@ -928,7 +928,7 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
       <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0;font-family:'Special Elite',monospace;font-size:11px" onclick="exportProgressPDF()">⬇ Télécharger PDF</button>
     </div>
     <div id="progress-content"></div>
-    <button class="btn" style="margin-top:0.5rem" onclick="showScreen('map')">← Retour à la carte</button>
+    <button class="btn" style="margin-top:0.5rem" onclick="buildMap();showScreen('map')">← Retour à la carte</button>
   </div>
 </div>
 
@@ -1160,7 +1160,7 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
       <strong style="color:var(--amber)">Bonus :</strong> Rapidité (≥20s restantes) = +5 pts · Série de 3 = +10 pts supplémentaires
     </div>
     <button class="btn btn-primary" id="ci-start-btn" onclick="startCountry()">🚀 Lancer la mission</button>
-    <button class="btn" onclick="showScreen('map')">← Retour à la carte</button>
+    <button class="btn" onclick="buildMap();showScreen('map')">← Retour à la carte</button>
   </div>
 </div>
 
@@ -1196,7 +1196,7 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
     <h2 style="font-size:20px;margin-bottom:8px">Mission échouée !</h2>
     <p style="font-size:13px;color:var(--text2);margin-bottom:1.5rem" id="go-msg"></p>
     <button class="btn btn-primary" onclick="retryCountry()">🔄 Retenter la mission</button>
-    <button class="btn" onclick="showScreen('map')">← Retour à la carte</button>
+    <button class="btn" onclick="buildMap();showScreen('map')">← Retour à la carte</button>
   </div>
 </div>
 
@@ -1208,7 +1208,7 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
     <div class="score-sub" id="ce-sub"></div>
     <div class="stat-grid" id="ce-stats"></div>
     <p class="end-msg" id="ce-msg"></p>
-    <button class="btn btn-primary" onclick="showScreen('map')">🗺️ Continuer l'aventure</button>
+    <button class="btn btn-primary" onclick="buildMap();showScreen('map')">🗺️ Continuer l'aventure</button>
   </div>
 </div>
 
@@ -1629,6 +1629,8 @@ function showSavedGameScreen(saved){
     <div style="font-family:'Crimson Text',serif;font-size:13px;line-height:1.9;flex-wrap:wrap;display:flex">${countryLines}</div>`;
   document.getElementById('reset-confirm-area').style.display='none';
   showScreen('saved-game');
+  const fab=document.getElementById('pdf-fab');
+  if(fab&&S.studentName) fab.style.display='block';
 }
 
 function resumeSavedGame(){
@@ -1691,11 +1693,11 @@ function openCountry(idx){
 function startCountry(isRetry=false){
   const c=COUNTRIES[S.currentCountryIdx];
   if (!isRetry) {
-    // Fresh start: reset attempt tracker for this country
     if (S.attemptsByCountry[c.id]) delete S.attemptsByCountry[c.id];
   }
   S.qIdx=0; S.lives=5; S.streak=0;
   S.currentQSet = buildQuestionSet(c.id);
+  // Only reset THIS country's result, keep other countries intact
   S.countryResults[c.id]={score:0,done:false,details:[],attempt:S.attemptsByCountry[c.id].count};
   showScreen('game'); loadQ();
 }
