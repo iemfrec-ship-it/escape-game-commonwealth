@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commonwealth Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Special+Elite&family=MedievalSharp&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #1a1008;
+  --bg2: #231608;
+  --bg3: #2e1f0a;
+  --surface: #271a09;
+  --border: rgba(180,130,50,0.18);
+  --border2: rgba(200,155,60,0.32);
+  --text: #f5e6c8;
+  --text2: #c4a66a;
+  --text3: #7a6030;
+  --gold: #e8b84b;
+  --gold2: #c99320;
+  --gold3: #fff0b0;
+  --red: #d94f3a;
+  --red2: #a82f1e;
+  --amber: #e8943a;
+  --green: #4caf82;
+  --green2: #357a5c;
+  --blue: #4a7eb5;
+  --purple: #8b6db5;
+  --ink: #0d0800;
+  --parchment: #f2dfa0;
+  --leather: #3d2409;
+  --uk: #4a7eb5;
+  --au: #4caf82;
+  --ca: #d94f3a;
+  --in: #e8943a;
+  --nz: #8b6db5;
+  --r: 8px;
+  --r2: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse 90% 50% at 50% -5%, rgba(90,55,10,0.7) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 10% 100%, rgba(60,30,5,0.5) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 60% at 90% 80%, rgba(40,20,5,0.4) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: 'Crimson Text', Georgia, serif;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+h1,h2,h3 { font-family: 'Cinzel', serif; letter-spacing: 0.03em; }
+
+/* Layout */
+#app { max-width: 680px; margin: 0 auto; padding: 1rem; min-height: 100vh; }
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* Cards */
+.card {
+  background:
+    linear-gradient(160deg, rgba(45,28,10,0.97) 0%, rgba(30,18,6,0.99) 100%);
+  border: 1px solid var(--border2);
+  border-radius: var(--r2);
+  padding: 1.25rem;
+  margin-bottom: 0.75rem;
+  box-shadow:
+    0 6px 32px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(220,170,60,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.4);
+  position: relative;
+}
+.card::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: var(--r2);
+  background-image:
+    repeating-linear-gradient(
+      0deg, transparent, transparent 2px,
+      rgba(180,130,50,0.015) 2px, rgba(180,130,50,0.015) 4px
+    );
+  pointer-events: none;
+}
+.card-accent {
+  border-color: rgba(220,170,60,0.4);
+  box-shadow:
+    0 4px 24px rgba(0,0,0,0.5),
+    0 0 0 1px rgba(220,170,60,0.1),
+    inset 0 1px 0 rgba(220,170,60,0.18);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 11px 20px;
+  border-radius: var(--r);
+  font-family: 'Special Elite', monospace; font-size: 13px; font-weight: 400;
+  letter-spacing: 0.04em;
+  cursor: pointer; border: 1px solid var(--border2);
+  background: linear-gradient(160deg, rgba(55,35,12,0.9), rgba(35,20,6,0.95));
+  color: var(--text2);
+  transition: all 0.18s; width: 100%; margin-bottom: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(200,150,50,0.1);
+}
+.btn:hover {
+  background: linear-gradient(160deg, rgba(75,50,18,0.95), rgba(50,30,10,0.98));
+  border-color: var(--gold2);
+  color: var(--gold3);
+}
+.btn-primary {
+  background: linear-gradient(135deg, #c99320, #a07010, #c99320);
+  background-size: 200% 100%;
+  color: #0d0800; border-color: #a07010; font-weight: 400;
+  font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.08em;
+  box-shadow: 0 3px 16px rgba(180,130,20,0.4), inset 0 1px 0 rgba(255,230,100,0.3);
+  text-shadow: 0 1px 2px rgba(255,220,80,0.3);
+}
+.btn-primary:hover {
+  background-position: 100% 0;
+  box-shadow: 0 4px 22px rgba(200,150,20,0.55), inset 0 1px 0 rgba(255,240,120,0.4);
+  transform: translateY(-1px);
+}
+.btn-sm { padding: 7px 14px; font-size: 13px; margin-bottom: 0; }
+.btn-inline { width: auto; }
+
+/* Tags / badges */
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px; border-radius: 4px;
+  font-family: 'Special Elite', monospace;
+  font-size: 10px; font-weight: 400; letter-spacing: 0.05em;
+}
+.tag-geo { background: rgba(30,50,80,0.5); color: #7aaad0; border: 1px solid rgba(60,100,160,0.3); }
+.tag-hist { background: rgba(80,50,10,0.5); color: #d4a850; border: 1px solid rgba(160,110,20,0.3); }
+.tag-soc { background: rgba(50,30,70,0.5); color: #b090d8; border: 1px solid rgba(120,80,180,0.3); }
+.tag-mon { background: rgba(20,50,30,0.5); color: #70c090; border: 1px solid rgba(50,130,70,0.3); }
+.tag-nat { background: rgba(60,30,10,0.5); color: #d08060; border: 1px solid rgba(150,80,30,0.3); }
+
+/* Progress bar */
+.prog-wrap {
+  background: rgba(30,18,6,0.8);
+  border: 1px solid rgba(120,80,20,0.2);
+  border-radius: 3px; height: 7px;
+}
+.prog-fill {
+  background: linear-gradient(90deg, #8a6010, #e8b84b, #c99320);
+  border-radius: 3px; height: 100%; transition: width 0.5s;
+  box-shadow: 0 0 6px rgba(200,150,30,0.3);
+}
+
+/* ===================== HOME ─ ADVENTURE STYLE ===================== */
+.home-hero { text-align: center; padding: 0 0 0.75rem; }
+
+/* ── Title plate ── */
+.home-title-wrap {
+  background: linear-gradient(180deg, rgba(30,18,4,0.0) 0%, rgba(20,12,2,0.6) 100%);
+  padding: 1.2rem 1rem 0.8rem;
+  position: relative;
+}
+.home-title-wrap::before, .home-title-wrap::after {
+  content: '──────────────────────';
+  display: block;
+  font-family: 'Special Elite', monospace;
+  font-size: 9px; color: var(--gold2); opacity: 0.5;
+  letter-spacing: 2px;
+}
+.home-title {
+  font-family: 'Cinzel', serif;
+  font-size: 26px; font-weight: 900;
+  color: var(--gold3);
+  margin: 6px 0 2px;
+  text-shadow:
+    0 0 30px rgba(220,170,40,0.6),
+    0 2px 4px rgba(0,0,0,0.8);
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+}
+.title-accent {
+  background: linear-gradient(90deg, #c99320, #ffe080, #c99320);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block; font-size: 34px; letter-spacing: 0.12em;
+}
+.home-sub {
+  font-family: 'Crimson Text', serif;
+  font-size: 15px; color: var(--text2);
+  line-height: 1.6; margin: 4px 0 0;
+  font-style: italic;
+}
+
+/* ── Adventure banner ── */
+.adv-banner {
+  position: relative; overflow: hidden;
+  background: linear-gradient(180deg,
+    rgba(10,6,2,0.95) 0%,
+    rgba(25,15,4,0.9) 40%,
+    rgba(8,5,1,0.98) 100%);
+  border-top: 1px solid rgba(180,130,40,0.2);
+  border-bottom: 1px solid rgba(180,130,40,0.2);
+  padding: 16px 0 12px;
+  margin-bottom: 1rem;
+}
+/* Rope line top/bottom */
+.adv-banner::before {
+  content: '';
+  position: absolute; left: 0; right: 0; top: 0; height: 3px;
+  background: repeating-linear-gradient(90deg,
+    #6b4a1a 0px, #6b4a1a 8px, #4a3010 8px, #4a3010 12px);
+  opacity: 0.6;
+}
+.adv-banner::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+  background: repeating-linear-gradient(90deg,
+    #6b4a1a 0px, #6b4a1a 8px, #4a3010 8px, #4a3010 12px);
+  opacity: 0.6;
+}
+
+/* Stamps */
+.passport-anim {
+  position: relative; height: 72px;
+  display: flex; align-items: center; justify-content: center;
+}
+.passport-stamp {
+  position: absolute; font-size: 26px;
+  animation: floatStamp 4s ease-in-out infinite;
+  filter: drop-shadow(0 3px 10px rgba(0,0,0,0.7));
+}
+.stamp-1 { left: 4%;  top: 10px; animation-delay: 0s; }
+.stamp-2 { left: 20%; top: 30px; animation-delay: 0.7s; }
+.stamp-3 { left: 42%; top: 4px;  animation-delay: 1.2s; font-size: 32px; }
+.stamp-4 { left: 63%; top: 28px; animation-delay: 0.4s; }
+.stamp-5 { left: 80%; top: 12px; animation-delay: 0.9s; }
+
+.plane-svg {
+  position: absolute; font-size: 18px; top: 38%;
+  animation: flyPlane 6s linear infinite;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));
+  z-index: 2;
+}
+@keyframes floatStamp {
+  0%,100% { transform: translateY(0) rotate(-4deg) scale(1); }
+  50%      { transform: translateY(-10px) rotate(4deg) scale(1.1); }
+}
+@keyframes flyPlane {
+  0%   { left: -5%; opacity: 0; }
+  6%   { opacity: 1; }
+  94%  { opacity: 1; }
+  100% { left: 105%; opacity: 0; }
+}
+
+/* Star/particle */
+.star { position: absolute; width: 1.5px; height: 1.5px; background: #d4aa50; border-radius: 50%; animation: twinkle 2.5s ease-in-out infinite; }
+@keyframes twinkle { 0%,100%{opacity:0.1} 50%{opacity:0.7} }
+
+/* Route */
+.country-flags-row {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 4px 0 2px; font-size: 20px;
+}
+.flag-divider {
+  font-family: 'Special Elite', monospace;
+  font-size: 9px; color: var(--gold2); opacity: 0.6; letter-spacing: 1px;
+}
+
+/* ── Role cards ── */
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 0.75rem; }
+
+.role-card {
+  border-radius: var(--r2); padding: 1.1rem 0.8rem 1rem;
+  text-align: center; cursor: pointer;
+  transition: all 0.22s; position: relative; overflow: hidden;
+}
+/* Corner rivets */
+.role-card::before, .role-card::after {
+  content: '';
+  position: absolute;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #d4aa50, #7a5a10);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.role-card::before { top: 7px; left: 7px; }
+.role-card::after  { top: 7px; right: 7px; }
+
+.student-card {
+  background: linear-gradient(155deg,
+    rgba(20,35,18,0.97) 0%,
+    rgba(12,22,10,0.99) 100%);
+  border: 1px solid rgba(80,160,80,0.3);
+  box-shadow: 0 5px 24px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(80,180,80,0.08);
+}
+.prof-card {
+  background: linear-gradient(155deg,
+    rgba(35,22,8,0.97) 0%,
+    rgba(22,12,4,0.99) 100%);
+  border: 1px solid rgba(200,150,40,0.35);
+  box-shadow: 0 5px 24px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(220,170,50,0.1);
+}
+.student-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(80,200,100,0.55);
+  box-shadow: 0 10px 36px rgba(0,0,0,0.7), 0 0 20px rgba(50,160,60,0.15);
+}
+.prof-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(220,170,50,0.6);
+  box-shadow: 0 10px 36px rgba(0,0,0,0.7), 0 0 20px rgba(200,150,30,0.2);
+}
+.role-card:hover::before, .role-card:hover::after { opacity: 1; }
+
+.role-icon-wrap { font-size: 30px; margin-bottom: 5px; display: block; }
+.role-title {
+  font-family: 'Cinzel', serif;
+  font-size: 13px; font-weight: 700;
+  letter-spacing: 0.06em; margin-bottom: 5px;
+}
+.student-card .role-title { color: #a8e8b0; }
+.prof-card    .role-title { color: var(--gold3); }
+.role-desc {
+  font-family: 'Crimson Text', serif;
+  font-size: 13px; color: var(--text2);
+  line-height: 1.5; margin-bottom: 10px; font-style: italic;
+}
+.role-cta {
+  display: inline-block;
+  font-family: 'Special Elite', monospace;
+  font-size: 11px; font-weight: 400;
+  padding: 4px 12px; border-radius: 4px; margin-top: 2px;
+  letter-spacing: 0.06em;
+}
+.student-card .role-cta {
+  background: rgba(50,160,70,0.15); color: #7fe890;
+  border: 1px solid rgba(50,160,70,0.3);
+}
+.prof-card .role-cta {
+  background: rgba(200,150,30,0.15); color: var(--gold);
+  border: 1px solid rgba(200,150,30,0.3);
+}
+
+/* ── Badges ── */
+.home-badges { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-bottom: 0.5rem; }
+.home-badge {
+  background: rgba(100,65,15,0.3);
+  border: 1px solid rgba(160,110,30,0.25);
+  border-radius: 4px; padding: 3px 10px;
+  font-family: 'Special Elite', monospace;
+  font-size: 10px; color: var(--text2); letter-spacing: 0.03em;
+}
+
+/* ===================== NAME ===================== */
+.name-wrap { text-align: center; padding: 2rem 0; }
+.name-icon { font-size: 40px; margin-bottom: 12px; }
+input[type=text] {
+  width: 100%; padding: 12px 16px;
+  background: rgba(15,9,2,0.8);
+  border: 1px solid var(--border2);
+  border-radius: var(--r); color: var(--text);
+  font-family: 'Special Elite', monospace; font-size: 15px;
+  margin-bottom: 1rem; outline: none; text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+}
+input[type=text]:focus {
+  border-color: var(--gold);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5), 0 0 0 2px rgba(200,150,30,0.15);
+}
+input[type=text]::placeholder { color: var(--text3); font-style: italic; }
+
+/* ===================== MAP ===================== */
+.map-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+.map-title { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--gold3); letter-spacing: 0.04em; }
+.score-pill {
+  background: rgba(180,130,20,0.15); border: 1px solid rgba(200,150,30,0.3);
+  border-radius: 6px; padding: 4px 12px;
+  font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--gold);
+}
+.world-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 1rem 0; }
+.country-card {
+  border: 1px solid rgba(160,110,30,0.2);
+  border-radius: var(--r); padding: 12px 6px;
+  text-align: center; cursor: pointer;
+  background: linear-gradient(160deg, rgba(35,22,8,0.9), rgba(22,13,4,0.95));
+  transition: all 0.2s;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+.country-card:hover:not(.locked) {
+  border-color: var(--gold);
+  background: linear-gradient(160deg, rgba(55,36,12,0.95), rgba(38,24,8,0.98));
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 12px rgba(180,130,20,0.12);
+}
+.country-card.locked { opacity: 0.3; cursor: not-allowed; filter: grayscale(0.6); }
+.country-card.done {
+  background: linear-gradient(160deg, rgba(15,30,15,0.95), rgba(10,20,10,0.98));
+  border-color: rgba(60,150,70,0.4);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4), 0 0 10px rgba(40,140,60,0.08);
+}
+.country-card.current-active {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(200,150,30,0.2), 0 4px 14px rgba(0,0,0,0.5);
+}
+.cc-flag { font-size: 24px; margin-bottom: 4px; }
+.cc-name { font-size: 10px; font-weight: 600; color: var(--text2); }
+.cc-pts { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.cc-check { font-size: 12px; color: var(--green); }
+.prog-info { display: flex; align-items: center; gap: 10px; margin-top: 0.75rem; }
+.prog-label { font-size: 12px; color: var(--text2); white-space: nowrap; }
+
+/* ===================== COUNTRY INTRO ===================== */
+.ci-banner {
+  border-radius: var(--r2); padding: 1.5rem; margin-bottom: 0.75rem; position: relative;
+  border: 1px solid rgba(200,150,40,0.3); overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6), inset 0 1px 0 rgba(220,170,50,0.12);
+}
+.ci-banner::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg, transparent, transparent 6px,
+    rgba(0,0,0,0.04) 6px, rgba(0,0,0,0.04) 12px
+  );
+  pointer-events: none;
+}
+.ci-banner::after {
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 100px; height: 100px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(220,170,50,0.06), transparent 70%);
+  pointer-events: none;
+}
+.ci-flag { font-size: 36px; margin-bottom: 6px; display: block; filter: drop-shadow(0 3px 10px rgba(0,0,0,0.6)); }
+.ci-name { font-family: 'Cinzel', serif; font-size: 22px; font-weight: 900; margin-bottom: 2px; letter-spacing: 0.04em; }
+.ci-sub { font-family: 'Special Elite', monospace; font-size: 11px; opacity: 0.65; margin-bottom: 10px; letter-spacing: 0.04em; }
+.ci-mission { font-family: 'Crimson Text', serif; font-size: 14px; line-height: 1.7; opacity: 0.85; font-style: italic; }
+.cats-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+.rules-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+.rule-box { background: linear-gradient(160deg, rgba(30,20,8,0.95), rgba(20,12,4,0.98)); border: 1px solid rgba(160,110,30,0.2); border-radius: var(--r); padding: 10px; text-align: center; }
+.rule-val { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: var(--gold); }
+.rule-lbl { font-family: 'Special Elite', monospace; font-size: 10px; color: var(--text2); margin-top: 2px; letter-spacing: 0.03em; }
+.rules-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
+.rule-box { background: var(--bg3); border-radius: var(--r); padding: 10px; text-align: center; }
+.rule-val { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: var(--green); }
+.rule-lbl { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* ===================== GAME ===================== */
+.hud {
+  display: flex; align-items: center; gap: 7px; margin-bottom: 0.75rem; flex-wrap: wrap;
+}
+.lives { display: flex; gap: 2px; align-items: center; }
+.lv { font-size: 15px; transition: all 0.2s; }
+.hud-score {
+  background: rgba(180,130,20,0.15); border: 1px solid rgba(200,150,30,0.3);
+  border-radius: 6px; padding: 4px 10px; font-size: 13px; font-weight: 600;
+  color: var(--gold); font-family: 'Special Elite', monospace;
+}
+.hud-timer {
+  background: rgba(180,80,20,0.12); border: 1px solid rgba(220,110,30,0.3);
+  border-radius: 6px; padding: 4px 10px; font-size: 13px; font-weight: 700;
+  color: var(--amber); font-family: 'Cinzel', serif;
+  min-width: 52px; text-align: center; transition: all 0.2s;
+}
+.hud-timer.urgent {
+  background: rgba(180,30,20,0.2); border-color: rgba(220,60,40,0.5);
+  color: var(--red); animation: pulse-red 0.5s ease-in-out infinite alternate;
+}
+@keyframes pulse-red { from { box-shadow: none; } to { box-shadow: 0 0 10px rgba(200,50,30,0.4); } }
+.streak-badge {
+  background: rgba(180,130,20,0.15); border: 1px solid rgba(200,150,30,0.3);
+  border-radius: 6px; padding: 3px 10px; font-size: 11px;
+  color: var(--gold); font-family: 'Special Elite', monospace;
+}
+.q-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.q-flag { font-size: 18px; }
+.q-country { font-size: 12px; color: var(--text2); }
+.q-num { margin-left: auto; font-size: 12px; color: var(--text3); }
+.q-text {
+  font-family: 'Cinzel', serif;
+  font-size: 16px; font-weight: 700; line-height: 1.5;
+  margin-bottom: 6px; color: var(--gold3);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.q-hint {
+  font-family: 'Crimson Text', serif;
+  font-size: 14px; color: var(--text2);
+  margin-bottom: 1rem; font-style: italic;
+}
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 0.75rem; }
+.choice {
+  padding: 12px 10px;
+  border: 1px solid rgba(160,110,30,0.25);
+  border-radius: var(--r);
+  background: linear-gradient(160deg, rgba(35,22,8,0.9), rgba(22,13,4,0.95));
+  color: var(--text2);
+  font-family: 'Crimson Text', serif; font-size: 15px; font-weight: 400;
+  cursor: pointer; text-align: left; transition: all 0.15s; line-height: 1.4;
+  box-shadow: inset 0 1px 0 rgba(200,150,40,0.06), 0 2px 6px rgba(0,0,0,0.3);
+  position: relative;
+}
+.choice::before {
+  content: '▸';
+  font-size: 10px; color: var(--gold2); opacity: 0;
+  position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+  transition: opacity 0.15s;
+}
+.choice:hover {
+  border-color: var(--gold2);
+  background: linear-gradient(160deg, rgba(55,38,14,0.95), rgba(38,24,8,0.98));
+  color: var(--gold3);
+  padding-left: 20px;
+}
+.choice:hover::before { opacity: 1; }
+.choice.correct {
+  background: linear-gradient(160deg, rgba(20,45,18,0.95), rgba(12,30,10,0.98));
+  border-color: var(--green); color: #8fdfaa;
+  box-shadow: 0 0 12px rgba(50,180,80,0.15);
+}
+.choice.wrong {
+  background: linear-gradient(160deg, rgba(50,15,10,0.95), rgba(35,10,6,0.98));
+  border-color: var(--red); color: #d88080;
+}
+.choice.reveal {
+  background: linear-gradient(160deg, rgba(20,45,18,0.9), rgba(12,30,10,0.95));
+  border-color: var(--green2); color: #7fd4a0;
+}
+.choice:disabled { cursor: not-allowed; }
+
+/* Feedback */
+.fb {
+  border-radius: var(--r); padding: 10px 13px;
+  font-size: 14px; line-height: 1.7; margin-bottom: 8px;
+  font-family: 'Crimson Text', serif;
+}
+.fb-ok {
+  background: linear-gradient(135deg, rgba(15,35,15,0.9), rgba(10,25,10,0.95));
+  border: 1px solid rgba(60,160,70,0.35); color: #9fdcaa;
+  box-shadow: 0 0 14px rgba(40,150,60,0.1);
+}
+.fb-ko {
+  background: linear-gradient(135deg, rgba(40,12,8,0.9), rgba(28,8,5,0.95));
+  border: 1px solid rgba(180,60,40,0.35); color: #d4908a;
+}
+.fb-info {
+  background: rgba(30,20,8,0.7); border: 1px solid rgba(160,110,30,0.25);
+  color: var(--text2); font-size: 13px; margin-top: 6px; font-style: italic;
+  border-left: 3px solid var(--gold2);
+}
+.fb-bonus {
+  background: rgba(40,28,6,0.7); border: 1px solid rgba(200,150,30,0.3);
+  color: var(--gold); font-size: 13px; margin-top: 4px;
+}
+
+/* ===================== END SCREENS ===================== */
+.medal-big { font-size: 56px; text-align: center; padding: 0.5rem 0; filter: drop-shadow(0 4px 14px rgba(0,0,0,0.6)); }
+.score-big {
+  font-family: 'Cinzel', serif;
+  font-size: 42px; font-weight: 700;
+  color: var(--gold);
+  text-align: center;
+  text-shadow: 0 0 20px rgba(200,150,30,0.4);
+}
+.score-sub { font-family: 'Crimson Text', serif; font-size: 14px; color: var(--text2); text-align: center; margin-top: 2px; font-style: italic; }
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 1rem 0; }
+.stat-box {
+  background: linear-gradient(160deg, rgba(35,22,8,0.95), rgba(22,13,4,0.98));
+  border: 1px solid rgba(160,110,30,0.2);
+  border-radius: var(--r); padding: 12px; text-align: center;
+}
+.stat-val {
+  font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700;
+  color: var(--gold3);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.stat-lbl {
+  font-family: 'Special Elite', monospace;
+  font-size: 10px; color: var(--text2); margin-top: 2px; letter-spacing: 0.03em;
+}
+.end-msg { font-family: 'Crimson Text', serif; font-size: 15px; color: var(--text2); line-height: 1.7; text-align: center; margin: 0.75rem 0 1rem; padding: 0 0.5rem; font-style: italic; }
+
+/* ===================== COUNTRY PROGRESS ===================== */
+.cp-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.cp-flag { font-size: 16px; min-width: 20px; }
+.cp-name { font-size: 13px; color: var(--text2); min-width: 115px; }
+.cp-bar-wrap {
+  flex: 1; background: rgba(20,12,4,0.7);
+  border: 1px solid rgba(120,80,20,0.15);
+  border-radius: 3px; height: 7px;
+}
+.cp-bar { border-radius: 3px; height: 100%; transition: width 0.5s; }
+.cp-pts { font-size: 12px; color: var(--text3); min-width: 80px; text-align: right; }
+
+/* ===================== PROF DASHBOARD ===================== */
+.dash-title { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; color: var(--gold3); letter-spacing: 0.04em; }
+.dash-icon { color: var(--green); font-size: 20px; }
+.tab-row {
+  display: flex;
+  background: rgba(20,12,4,0.8);
+  border: 1px solid rgba(160,110,30,0.2);
+  border-radius: var(--r); padding: 3px; margin-bottom: 1rem; gap: 3px;
+}
+.tab {
+  flex: 1; padding: 8px; text-align: center;
+  font-family: 'Special Elite', monospace; font-size: 11px;
+  letter-spacing: 0.04em; cursor: pointer; border: none;
+  background: transparent; color: var(--text3);
+  border-radius: 6px; transition: all 0.15s;
+}
+.tab.active {
+  background: linear-gradient(160deg, rgba(50,32,10,0.95), rgba(35,22,6,0.98));
+  color: var(--gold);
+  border: 1px solid rgba(180,130,30,0.3);
+}
+.student-row { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); transition: background 0.15s; border-radius: var(--r); padding: 8px 8px; }
+.student-row:hover { background: rgba(40,26,10,0.6); border-radius: var(--r); }
+.student-row:last-child { border-bottom: none; }
+.student-row-main { display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; min-width: 0; }
+.btn-delete {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  border: 1px solid rgba(180,60,40,0.25);
+  background: rgba(50,12,8,0.5);
+  color: rgba(200,100,80,0.6);
+  font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  font-family: 'Special Elite', monospace;
+  padding: 0;
+}
+.btn-delete:hover {
+  background: rgba(140,30,15,0.7);
+  border-color: rgba(220,70,50,0.5);
+  color: #ff9080;
+  box-shadow: 0 0 10px rgba(180,40,20,0.3);
+}
+/* Confirm delete overlay */
+.delete-confirm {
+  background: linear-gradient(160deg, rgba(50,15,8,0.98), rgba(35,8,4,1));
+  border: 1px solid rgba(200,70,50,0.4);
+  border-radius: var(--r); padding: 10px 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  flex-wrap: wrap;
+}
+.delete-confirm-msg {
+  font-family: 'Crimson Text', serif; font-size: 14px; font-style: italic;
+  color: #d49090; flex: 1;
+}
+.delete-confirm-btns { display: flex; gap: 6px; }
+.btn-confirm-yes {
+  padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;
+  background: rgba(160,40,20,0.7); border: 1px solid rgba(200,60,40,0.5);
+  color: #ffaaaa; font-family: 'Special Elite', monospace;
+  transition: all 0.15s;
+}
+.btn-confirm-yes:hover { background: rgba(200,50,25,0.9); color: #fff; }
+.btn-confirm-no {
+  padding: 5px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;
+  background: rgba(40,26,10,0.7); border: 1px solid rgba(160,110,30,0.3);
+  color: var(--text2); font-family: 'Special Elite', monospace;
+  transition: all 0.15s;
+}
+.btn-confirm-no:hover { border-color: var(--gold2); color: var(--gold); }
+.avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgba(220,170,50,0.4), rgba(100,60,10,0.6));
+  border: 1px solid rgba(200,150,30,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--gold3);
+  flex-shrink: 0; font-family: 'Cinzel', serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(220,170,50,0.2);
+}
+.stu-name { font-family: 'Special Elite', monospace; font-size: 13px; color: var(--gold3); letter-spacing: 0.04em; }
+.stu-sub { font-size: 12px; color: var(--text2); }
+.stu-prog { flex: 1; }
+.stu-score { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700; color: var(--green); white-space: nowrap; }
+.mini-prog {
+  background: rgba(20,12,4,0.8); border-radius: 2px; height: 4px; margin-top: 4px;
+}
+.mini-fill {
+  background: linear-gradient(90deg, #8a6010, #e8b84b);
+  border-radius: 2px; height: 4px;
+}
+.detail-panel { background: linear-gradient(160deg, rgba(30,20,8,0.9), rgba(20,12,4,0.95)); border: 1px solid rgba(140,90,20,0.2); border-radius: var(--r); padding: 10px 12px; margin-top: 6px; }
+.rank-badge { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--text3); min-width: 22px; }
+.section-title { font-family: 'Special Elite', monospace; font-size: 12px; color: var(--gold2); margin: 1rem 0 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+.note { font-size: 11px; color: var(--text3); text-align: center; margin-top: 8px; line-height: 1.5; }
+.empty-state { text-align: center; padding: 2rem 1rem; color: var(--text2); font-size: 14px; line-height: 1.6; }
+.pct-good { color: #5ef0c0; } .pct-mid { color: var(--amber); } .pct-bad { color: var(--red); }
+
+/* Animations */
+@keyframes pop { 0%{transform:scale(0.85);opacity:0} 60%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+.pop { animation: pop 0.3s ease forwards; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.shake { animation: shake 0.35s ease; }
+
+.rules-section {
+  background: linear-gradient(160deg, rgba(30,20,8,0.85), rgba(20,12,4,0.9));
+  border: 1px solid rgba(160,110,30,0.18);
+  border-left: 3px solid var(--gold2);
+  border-radius: var(--r);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.rules-section-title {
+  font-family: 'Special Elite', monospace;
+  font-size: 12px; font-weight: 400;
+  color: var(--gold); letter-spacing: 0.05em;
+  margin-bottom: 6px; text-transform: uppercase;
+}
+.rules-section-body {
+  font-family: 'Crimson Text', serif;
+  font-size: 14px; color: var(--text2);
+  line-height: 1.7;
+}
+.rules-section-body strong { color: var(--text); font-weight: 600; }
+.rules-score-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 4px 0;
+  border-bottom: 1px solid rgba(160,110,30,0.1);
+}
+.rules-score-row:last-child { border-bottom: none; }
+.rules-score-tag {
+  font-family: 'Crimson Text', serif; font-size: 13px; font-style: italic;
+  padding: 1px 8px; border-radius: 4px; flex: 1;
+}
+.rules-score-tag.ok    { color: #9fdcaa; background: rgba(40,100,50,0.2); }
+.rules-score-tag.mid   { color: var(--text2); background: rgba(100,70,20,0.2); }
+.rules-score-tag.bad   { color: #d4908a; background: rgba(100,30,20,0.2); }
+.rules-score-tag.bonus { color: var(--gold); background: rgba(150,100,20,0.2); }
+.rules-score-val {
+  font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
+  color: var(--gold3); white-space: nowrap;
+}
+
+.btn-home-link {
+  background: rgba(40,26,8,0.6);
+  border: 1px solid rgba(160,110,30,0.2);
+  border-radius: 6px; padding: 5px 14px;
+  font-family: 'Special Elite', monospace;
+  font-size: 11px; color: var(--text3);
+  cursor: pointer; transition: all 0.15s;
+  letter-spacing: 0.04em;
+}
+.btn-home-link:hover {
+  border-color: rgba(200,150,40,0.4);
+  color: var(--gold2);
+  background: rgba(55,36,12,0.7);
+}
+
+/* ── Résumé de sauvegarde ── */
+.save-resume-box {
+  background: linear-gradient(160deg, rgba(20,35,18,0.96), rgba(12,24,10,0.98));
+  border: 1px solid rgba(60,160,70,0.35);
+  border-radius: var(--r2); padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 14px rgba(40,140,60,0.08);
+}
+.save-resume-title {
+  font-family: 'Cinzel', serif; font-size: 13px; color: #9fdcaa;
+  letter-spacing: 0.05em; margin-bottom: 6px;
+}
+.save-resume-code {
+  font-family: 'Cinzel', serif; font-size: 22px; font-weight: 700;
+  color: var(--gold); letter-spacing: 4px;
+}
+.save-resume-meta {
+  font-family: 'Special Elite', monospace; font-size: 10px;
+  color: var(--text3); margin-top: 4px; letter-spacing: 0.03em;
+}
+.save-resume-progress {
+  margin-top: 10px;
+  font-family: 'Crimson Text', serif; font-size: 13px; color: var(--text2);
+}
+
+/* ── Bouton PDF flottant ── */
+#pdf-fab {
+  position: fixed; bottom: 18px; right: 16px; z-index: 999;
+  background: linear-gradient(135deg, #c99320, #a07010);
+  border: 1px solid #8a6010;
+  border-radius: 50px; padding: 9px 16px;
+  font-family: 'Special Elite', monospace; font-size: 12px;
+  color: #0d0800; font-weight: 400; letter-spacing: 0.04em;
+  cursor: pointer; display: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 12px rgba(180,130,20,0.3);
+  transition: all 0.2s;
+}
+#pdf-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.6), 0 0 18px rgba(200,150,20,0.4);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: rgba(15,9,2,0.8); } ::-webkit-scrollbar-thumb { background: rgba(140,90,20,0.5); border-radius: 99px; border: 1px solid rgba(180,120,30,0.2); }
+
+/* ===================== PIN / CODE SCREENS ===================== */
+.pin-wrap { text-align: center; padding: 2rem 1rem; }
+.pin-icon { font-size: 44px; margin-bottom: 12px; display: block; }
+.pin-title { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700; margin-bottom: 6px; color: var(--gold3); letter-spacing: 0.04em; }
+.pin-sub { font-family: 'Crimson Text', serif; font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 1.5rem; font-style: italic; }
+.pin-dots { display: flex; gap: 10px; justify-content: center; margin-bottom: 1.5rem; }
+.pin-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid rgba(160,110,30,0.4); background: transparent;
+  transition: all 0.2s;
+}
+.pin-dot.filled {
+  background: radial-gradient(circle at 35% 35%, #ffe080, #c99320);
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(200,150,30,0.6), inset 0 1px 2px rgba(255,240,100,0.4);
+}
+.pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 240px; margin: 0 auto 1rem; }
+.pin-key {
+  padding: 14px 0; border-radius: var(--r);
+  border: 1px solid rgba(160,110,30,0.3);
+  background: linear-gradient(160deg, rgba(40,26,10,0.95), rgba(26,16,5,0.98));
+  color: var(--gold3);
+  font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700;
+  cursor: pointer; transition: all 0.12s; text-align: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(200,150,40,0.1);
+}
+.pin-key:hover {
+  background: linear-gradient(160deg, rgba(65,42,15,0.98), rgba(45,28,10,1));
+  border-color: var(--gold); color: var(--gold3);
+  transform: scale(1.06);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 0 10px rgba(180,130,20,0.15);
+}
+.pin-key:active { transform: scale(0.94); }
+.pin-key.del { font-size: 14px; color: var(--text2); font-family: 'Special Elite', monospace; }
+.pin-key.zero { grid-column: 2; }
+.pin-error {
+  background: rgba(50,12,8,0.7); border: 1px solid rgba(180,60,40,0.4);
+  border-radius: var(--r); padding: 10px 14px;
+  font-family: 'Crimson Text', serif; font-size: 14px; color: #d4908a;
+  text-align: center; margin-bottom: 1rem; display: none;
+}
+
+/* Session code display in prof */
+.session-code-box {
+  background: linear-gradient(160deg, rgba(45,30,8,0.97), rgba(30,18,4,0.99));
+  border: 1px solid rgba(200,150,30,0.35);
+  border-radius: var(--r2);
+  padding: 1.25rem; text-align: center; margin-bottom: 1rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 1px 0 rgba(220,170,50,0.1);
+}
+.session-code-label {
+  font-family: 'Special Elite', monospace;
+  font-size: 11px; color: var(--text2); margin-bottom: 8px;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.session-code-value {
+  font-family: 'Cinzel', serif; font-size: 42px; font-weight: 900;
+  color: var(--gold); letter-spacing: 10px;
+  text-shadow: 0 0 24px rgba(200,150,30,0.5), 0 2px 4px rgba(0,0,0,0.6);
+}
+.session-code-hint {
+  font-family: 'Crimson Text', serif;
+  font-size: 12px; color: var(--text3); margin-top: 6px; font-style: italic;
+}
+</style>
+</head>
+<body>
+<div id="app">
+<button id="pdf-fab" onclick="renderProgressContent();exportProgressPDF()" title="Télécharger mes résultats en PDF">⬇ PDF résultats</button>
+
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="home-hero">
+    <div class="adv-banner">
+      <div class="passport-anim" aria-hidden="true">
+        <div class="passport-stamp stamp-1">🇬🇧</div>
+        <div class="passport-stamp stamp-2">🇦🇺</div>
+        <div class="passport-stamp stamp-3">🇨🇦</div>
+        <div class="passport-stamp stamp-4">🇮🇳</div>
+        <div class="passport-stamp stamp-5">🇳🇿</div>
+        <div class="plane-svg">✈️</div>
+      </div>
+      <div class="country-flags-row">
+        <span>🇬🇧</span><span class="flag-divider">····</span>
+        <span>🇦🇺</span><span class="flag-divider">····</span>
+        <span>🇨🇦</span><span class="flag-divider">····</span>
+        <span>🇮🇳</span><span class="flag-divider">····</span>
+        <span>🇳🇿</span>
+      </div>
+    </div>
+    <div class="home-title-wrap">
+      <h1 class="home-title">Commonwealth<span class="title-accent">EXPLORER</span></h1>
+      <p class="home-sub">5 territoires. 60 épreuves. Une seule mission :<br>percer les secrets des cultures anglophones.</p>
+    </div>
+  </div>
+
+  <div class="role-grid">
+    <div class="role-card student-card" onclick="showScreen('student-code')">
+      <div class="role-icon-wrap">🎒</div>
+      <div class="role-title">Explorateur</div>
+      <div class="role-desc">Saisis le code de mission confié par ton guide et pars à l'aventure !</div>
+      <div class="role-cta">▶ Rejoindre la mission</div>
+    </div>
+    <div class="role-card prof-card" onclick="showScreen('prof-pin')">
+      <div class="role-icon-wrap">🗺️</div>
+      <div class="role-title">Guide / Professeur</div>
+      <div class="role-desc">Accède au quartier général et pilote les expéditions de tes élèves.</div>
+      <div class="role-cta">▶ Accès QG</div>
+    </div>
+  </div>
+
+  <div class="home-badges">
+    <span class="home-badge">🏅 Score &amp; classement</span>
+    <span class="home-badge">🔥 Séries</span>
+    <span class="home-badge">⏱ Chrono</span>
+    <span class="home-badge">❤️ Vies</span>
+    <span class="home-badge">🎲 Questions variées</span>
+  </div>
+
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:0.75rem;flex-wrap:wrap">
+    <button class="btn-home-link" onclick="showScreen('rules')">📜 Règles du jeu</button>
+    <button class="btn-home-link" onclick="showScreen('rgpd')">🔒 RGPD</button>
+  </div>
+</div>
+
+<!-- STUDENT PROGRESS -->
+<div id="screen-student-progress" class="screen">
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+      <h2 style="font-family:'Cinzel',serif;font-size:17px;color:var(--gold);letter-spacing:0.04em">📊 Ma progression</h2>
+      <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0;font-family:'Special Elite',monospace;font-size:11px" onclick="exportProgressPDF()">⬇ Télécharger PDF</button>
+    </div>
+    <div id="progress-content"></div>
+    <button class="btn" style="margin-top:0.5rem" onclick="showScreen('map')">← Retour à la carte</button>
+  </div>
+</div>
+
+<!-- RULES -->
+<div id="screen-rules" class="screen">
+  <div class="card">
+    <h2 style="font-family:'Cinzel',serif;font-size:18px;color:var(--gold);margin-bottom:1.25rem;text-align:center;letter-spacing:0.05em">📜 Règles de l'aventure</h2>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🗺️ Le principe</div>
+      <div class="rules-section-body">Tu explores 5 pays du Commonwealth dans l'ordre. Pour débloquer un nouveau pays, tu dois terminer le précédent. Chaque pays comporte <strong>12 questions</strong> sur sa géographie, son histoire, ses monuments et sa société.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">❤️ Les vies</div>
+      <div class="rules-section-body">Tu commences chaque pays avec <strong>5 vies</strong>. Une mauvaise réponse = −1 vie. Si tu perds toutes tes vies, la mission échoue et tu dois recommencer ce pays.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">⏱ Le chrono</div>
+      <div class="rules-section-body">Chaque question doit être répondue en <strong>25 secondes</strong>. Si le temps s'écoule, tu perds une vie et la bonne réponse s'affiche automatiquement.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🏅 Le score</div>
+      <div class="rules-section-body">
+        <div class="rules-score-row"><span class="rules-score-tag ok">Bonne réponse (1er essai)</span><span class="rules-score-val">+15 pts</span></div>
+        <div class="rules-score-row"><span class="rules-score-tag mid">Bonne réponse (2e essai)</span><span class="rules-score-val">+8 pts</span></div>
+        <div class="rules-score-row"><span class="rules-score-tag bad">Mauvaise réponse</span><span class="rules-score-val">−1 vie</span></div>
+        <div class="rules-score-row"><span class="rules-score-tag bonus">Réponse rapide (≥20s restantes)</span><span class="rules-score-val">+5 pts bonus</span></div>
+        <div class="rules-score-row"><span class="rules-score-tag bonus">Série de 3 bonnes réponses</span><span class="rules-score-val">+10 pts bonus</span></div>
+      </div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🎲 Les questions</div>
+      <div class="rules-section-body">À chaque nouvelle tentative sur un pays, les questions sont <strong>mélangées différemment</strong>. Les 3 premiers essais proposent un ordre inédit. À partir du 4e essai, les questions des essais précédents sont remixées.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🏆 Score maximum</div>
+      <div class="rules-section-body">Le score maximum est de <strong>900 points</strong> (180 pts par pays × 5 pays). Ta médaille finale dépend de ton taux de réussite global.</div>
+    </div>
+
+    <button class="btn" style="margin-top:0.5rem" onclick="showScreen('home')">← Retour à l'accueil</button>
+  </div>
+</div>
+
+<!-- RGPD -->
+<div id="screen-rgpd" class="screen">
+  <div class="card">
+    <h2 style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin-bottom:1.25rem;display:flex;align-items:center;gap:8px;letter-spacing:0.04em">🔒 Protection des données personnelles</h2>
+
+    <div class="rules-section">
+      <div class="rules-section-title">📌 Outil pédagogique</div>
+      <div class="rules-section-body">Cette application est un outil pédagogique développé pour un usage en classe.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🖥️ Aucune transmission externe</div>
+      <div class="rules-section-body">Aucune donnée n'est transmise à un serveur externe : toutes les informations (identifiant, réponses, score) restent uniquement dans la mémoire de votre navigateur, le temps de la partie en cours.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🚫 Aucun traceur</div>
+      <div class="rules-section-body">Aucun cookie tiers, aucun traceur publicitaire, aucun appel à une API externe n'est utilisé.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🪪 Données saisies</div>
+      <div class="rules-section-body">Les seules données saisies sont : les deux premières lettres de votre prénom et de votre nom — utilisées uniquement pour générer un identifiant au format <strong style="color:var(--gold);font-family:'Cinzel',serif">XX-YY</strong>, sans jamais collecter votre identité complète — ainsi que vos réponses aux exercices.</div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">🗑️ Effacement automatique</div>
+      <div class="rules-section-body">Ces données ne sont jamais sauvegardées : elles disparaissent automatiquement si vous rechargez ou fermez la page. <strong>Pensez à télécharger votre PDF de résultats avant de quitter l'application.</strong></div>
+    </div>
+
+    <div class="rules-section">
+      <div class="rules-section-title">📄 Le PDF de résultats</div>
+      <div class="rules-section-body">Le PDF généré est créé localement dans votre navigateur ; il n'est envoyé à personne automatiquement. C'est à vous de le transmettre à votre professeur.</div>
+    </div>
+
+    <button class="btn" style="margin-top:0.5rem" onclick="showScreen('home')">← Retour à l'accueil</button>
+  </div>
+</div>
+
+<!-- PROF PIN -->
+<div id="screen-prof-pin" class="screen">
+  <div class="card">
+    <div class="pin-wrap">
+      <span class="pin-icon">🔐</span>
+      <div class="pin-title">Accès Professeur</div>
+      <div class="pin-sub">Entre ton code PIN à 4 chiffres</div>
+      <div class="pin-dots" id="prof-pin-dots">
+        <div class="pin-dot" id="ppd-0"></div>
+        <div class="pin-dot" id="ppd-1"></div>
+        <div class="pin-dot" id="ppd-2"></div>
+        <div class="pin-dot" id="ppd-3"></div>
+      </div>
+      <div class="pin-error" id="prof-pin-error">Code incorrect. Réessaie.</div>
+      <div class="pin-keypad">
+        <button class="pin-key" onclick="profPinKey('1')">1</button>
+        <button class="pin-key" onclick="profPinKey('2')">2</button>
+        <button class="pin-key" onclick="profPinKey('3')">3</button>
+        <button class="pin-key" onclick="profPinKey('4')">4</button>
+        <button class="pin-key" onclick="profPinKey('5')">5</button>
+        <button class="pin-key" onclick="profPinKey('6')">6</button>
+        <button class="pin-key" onclick="profPinKey('7')">7</button>
+        <button class="pin-key" onclick="profPinKey('8')">8</button>
+        <button class="pin-key" onclick="profPinKey('9')">9</button>
+        <button class="pin-key del" onclick="profPinDel()">⌫</button>
+        <button class="pin-key zero" onclick="profPinKey('0')">0</button>
+        <button class="pin-key del" onclick="profPinClear()">✕</button>
+      </div>
+    </div>
+    <button class="btn" onclick="showScreen('home')">← Retour</button>
+  </div>
+</div>
+
+<!-- STUDENT CODE -->
+<div id="screen-student-code" class="screen">
+  <div class="card">
+    <div class="pin-wrap">
+      <span class="pin-icon">🗝️</span>
+      <div class="pin-title">Code de mission</div>
+      <div class="pin-sub">Entre le code donné par ton professeur<br>pour accéder à l'aventure</div>
+      <input type="text" id="stu-code-input"
+        placeholder="Code de session…"
+        maxlength="30"
+        style="margin:1rem 0 0.5rem;font-size:18px;letter-spacing:3px;text-align:center;font-family:'Special Elite',monospace"
+        oninput="this.value=this.value" onkeydown="if(event.key==='Enter')checkStuCode()">
+      <div class="pin-error" id="stu-code-error" style="margin-top:8px">Code incorrect. Demande le code à ton professeur.</div>
+      <button class="btn btn-primary" style="margin-top:1rem" onclick="checkStuCode()">▶ Valider le code</button>
+    </div>
+    <button class="btn" onclick="showScreen('home')">← Retour</button>
+  </div>
+</div>
+
+<!-- STUDENT IDENT -->
+<div id="screen-student-name" class="screen">
+  <div class="card" style="padding:2rem 1.5rem">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div class="name-icon">🧭</div>
+      <h2 style="font-size:20px;margin-bottom:6px">Identification de l'explorateur</h2>
+      <p style="font-size:13px;color:var(--text2);line-height:1.6">Utilise uniquement les <strong style="color:var(--green)">2 premières lettres de ton prénom</strong> et les <strong style="color:var(--green)">2 premières lettres de ton nom</strong>.<br>Aucune donnée personnelle n'est enregistrée.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">
+      <div>
+        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:6px;font-weight:500">2 lettres du prénom</label>
+        <input type="text" id="input-prenom" placeholder="ex : CA" maxlength="2" oninput="updatePreview()" style="text-transform:uppercase;text-align:center;font-size:22px;font-weight:700;letter-spacing:6px;font-family:'Cinzel',serif">
+      </div>
+      <div>
+        <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:6px;font-weight:500">2 lettres du nom</label>
+        <input type="text" id="input-nom" placeholder="ex : IE" maxlength="2" oninput="updatePreview()" style="text-transform:uppercase;text-align:center;font-size:22px;font-weight:700;letter-spacing:6px;font-family:'Cinzel',serif">
+      </div>
+    </div>
+    <div style="margin-bottom:1rem">
+      <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:6px;font-weight:500">Ta classe</label>
+      <input type="text" id="input-classe" placeholder="ex : 2PRO-A" maxlength="20" oninput="updatePreview()" style="text-align:center">
+    </div>
+    <div id="ident-preview" style="display:none;background:var(--bg3);border-radius:var(--r);padding:10px 14px;text-align:center;margin-bottom:1rem;font-size:13px;color:var(--text2)">
+      Ton code explorateur : <strong id="ident-code" style="color:var(--green);font-family:'Cinzel',serif;font-size:18px;letter-spacing:3px"></strong>
+    </div>
+    <div id="ident-error" style="display:none;background:rgba(255,92,92,0.1);border:1px solid rgba(255,92,92,0.25);border-radius:var(--r);padding:10px 14px;font-size:13px;color:#ffaaaa;margin-bottom:1rem;text-align:center"></div>
+    <button class="btn btn-primary" onclick="confirmName()">Commencer l'aventure →</button>
+    <button class="btn" onclick="showScreen('home')">← Retour</button>
+  </div>
+</div>
+
+<!-- SAVED GAME -->
+<div id="screen-saved-game" class="screen">
+  <div class="card">
+    <h2 style="font-family:'Cinzel',serif;font-size:17px;color:var(--gold);margin-bottom:1.25rem;letter-spacing:0.04em;text-align:center">🧭 Aventure retrouvée</h2>
+    <div class="save-resume-box" id="saved-game-box"></div>
+    <button class="btn btn-primary" onclick="resumeSavedGame()">▶ Poursuivre l'aventure</button>
+    <button class="btn" style="border-color:rgba(200,80,60,0.3);color:#d49090" onclick="confirmResetSaved()">↺ Recommencer à zéro</button>
+    <div id="reset-confirm-area" style="display:none;margin-top:0.5rem">
+      <div class="delete-confirm">
+        <div class="delete-confirm-msg">⚠️ Toute ta progression sera effacée. Tu es sûr(e) ?</div>
+        <div class="delete-confirm-btns">
+          <button class="btn-confirm-yes" onclick="doResetSaved()">✓ Oui, recommencer</button>
+          <button class="btn-confirm-no" onclick="document.getElementById('reset-confirm-area').style.display='none'">✕ Annuler</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAP -->
+<div id="screen-map" class="screen">
+  <div class="card">
+    <div class="map-header">
+      <div class="map-title">🗺️ Carte du Commonwealth</div>
+      <div class="score-pill" id="map-score-pill">0 pts</div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Bonjour <strong id="map-name"></strong> ! Explore les pays dans l'ordre pour débloquer de nouveaux défis.</p>
+    <div class="world-grid" id="world-grid"></div>
+    <div class="prog-info">
+      <span class="prog-label">Progression :</span>
+      <div class="prog-wrap" style="flex:1"><div class="prog-fill" id="global-prog-fill" style="width:0%"></div></div>
+      <span class="prog-label" id="global-prog-label">0 / 60</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:0.25rem">
+    <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0" onclick="renderProgressContent();showScreen('student-progress')">📊 Ma progression</button>
+    <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0" onclick="showScreen('home')">← Accueil</button>
+  </div>
+</div>
+
+<!-- COUNTRY INTRO -->
+<div id="screen-country-intro" class="screen">
+  <div class="ci-banner" id="ci-banner">
+    <span class="ci-flag" id="ci-flag"></span>
+    <div class="ci-name" id="ci-name"></div>
+    <div class="ci-sub" id="ci-sub"></div>
+    <div class="ci-mission" id="ci-mission"></div>
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">Thèmes du défi :</div>
+    <div class="cats-wrap" id="ci-cats"></div>
+    <div class="rules-row">
+      <div class="rule-box"><div class="rule-val">12</div><div class="rule-lbl">questions</div></div>
+      <div class="rule-box"><div class="rule-val">5</div><div class="rule-lbl">vies</div></div>
+      <div class="rule-box"><div class="rule-val">25s</div><div class="rule-lbl">par question</div></div>
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--r);padding:10px 12px;font-size:12px;color:var(--text2);margin-bottom:1rem;line-height:1.6">
+      <strong style="color:var(--green)">Score :</strong> Bonne réponse 1er essai = +15 pts · 2e essai = +8 pts · Erreur = −1 vie<br>
+      <strong style="color:var(--amber)">Bonus :</strong> Rapidité (≥20s restantes) = +5 pts · Série de 3 = +10 pts supplémentaires
+    </div>
+    <button class="btn btn-primary" id="ci-start-btn" onclick="startCountry()">🚀 Lancer la mission</button>
+    <button class="btn" onclick="showScreen('map')">← Retour à la carte</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div id="screen-game" class="screen">
+  <div class="hud">
+    <div class="lives" id="lives-hud"></div>
+    <div id="streak-hud" style="display:none"></div>
+    <div class="prog-wrap" style="flex:1"><div class="prog-fill" id="q-prog-fill" style="width:0%"></div></div>
+    <div id="g-attempt-badge" style="display:none;background:rgba(255,209,102,0.12);border:1px solid rgba(255,209,102,0.25);border-radius:99px;padding:4px 9px;font-size:11px;font-weight:600;color:var(--gold);white-space:nowrap"></div>
+    <div class="hud-score" id="g-score">0</div>
+    <div class="hud-timer" id="g-timer">25</div>
+  </div>
+  <div class="card card-accent">
+    <div class="q-meta">
+      <span class="q-flag" id="g-flag"></span>
+      <span class="q-country" id="g-country"></span>
+      <span class="tag" id="g-tag"></span>
+      <span class="q-num" id="g-qnum"></span>
+    </div>
+    <div class="q-text" id="g-qtext"></div>
+    <div class="q-hint" id="g-hint"></div>
+    <div class="choices" id="g-choices"></div>
+    <div id="g-fb" style="display:none"></div>
+    <button class="btn btn-primary" id="g-next" style="display:none" onclick="nextQ()">Question suivante →</button>
+  </div>
+</div>
+
+<!-- GAME OVER -->
+<div id="screen-game-over" class="screen">
+  <div class="card" style="text-align:center;padding:2rem">
+    <div style="font-size:48px;margin-bottom:12px">💀</div>
+    <h2 style="font-size:20px;margin-bottom:8px">Mission échouée !</h2>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1.5rem" id="go-msg"></p>
+    <button class="btn btn-primary" onclick="retryCountry()">🔄 Retenter la mission</button>
+    <button class="btn" onclick="showScreen('map')">← Retour à la carte</button>
+  </div>
+</div>
+
+<!-- COUNTRY END -->
+<div id="screen-country-end" class="screen">
+  <div class="card">
+    <div class="medal-big pop" id="ce-medal"></div>
+    <div class="score-big" id="ce-score"></div>
+    <div class="score-sub" id="ce-sub"></div>
+    <div class="stat-grid" id="ce-stats"></div>
+    <p class="end-msg" id="ce-msg"></p>
+    <button class="btn btn-primary" onclick="showScreen('map')">🗺️ Continuer l'aventure</button>
+  </div>
+</div>
+
+<!-- FINAL -->
+<div id="screen-final" class="screen">
+  <div class="card">
+    <div class="medal-big pop" id="fin-medal"></div>
+    <div class="score-big" id="fin-score"></div>
+    <div class="score-sub">points sur 900 possibles</div>
+    <div class="stat-grid" id="fin-stats"></div>
+    <p class="end-msg" id="fin-msg"></p>
+    <div id="fin-recap" style="margin-bottom:1rem"></div>
+    <button class="btn btn-primary" onclick="resetAll()">🔄 Nouvelle aventure</button>
+    <button class="btn" onclick="showScreen('home')">← Accueil</button>
+  </div>
+</div>
+
+<!-- PROF -->
+<div id="screen-prof" class="screen">
+  <div class="dash-title"><span class="dash-icon">📊</span>Tableau de bord professeur</div>
+  <div class="session-code-box">
+    <div class="session-code-label">🗝️ Code de session élèves — à afficher au tableau</div>
+    <div class="session-code-value" id="session-code-display">1234</div>
+    <div class="session-code-hint">Les élèves saisissent ce code pour accéder au jeu</div>
+    <div id="session-edit-area" style="display:none;margin-top:12px">
+      <div style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap">
+        <input type="text" id="session-code-input"
+          placeholder="Nouveau code"
+          maxlength="4"
+          
+          style="width:160px;text-align:center;font-size:22px;font-weight:700;
+                 letter-spacing:8px;font-family:'Cinzel',serif;
+                 padding:10px 12px;margin-bottom:0;
+                 background:rgba(255,209,102,0.08);
+                 border:1px solid rgba(255,209,102,0.35);
+                 border-radius:var(--r);color:var(--gold)">
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-inline btn-primary" style="width:auto;margin-bottom:0" onclick="confirmNewCode()">✓ Valider</button>
+          <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0;font-size:12px" onclick="cancelEditCode()">✕ Annuler</button>
+        </div>
+      </div>
+      <div id="session-code-error" style="display:none;font-size:12px;color:#ffaaaa;margin-top:8px;text-align:center"></div>
+    </div>
+    <div id="session-edit-btn-area" style="display:none"></div>
+  </div>
+
+  <div id="prof-class-view"></div>
+  <div style="height:1px;background:rgba(160,110,30,0.15);margin:0.25rem 0 0.75rem"></div>
+  <div id="prof-stats-view"></div>
+  <div style="margin-top:1rem">
+    <button class="btn btn-sm btn-inline" onclick="showScreen('home')">← Accueil</button>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// ===================== CONSTANTS =====================
+const PROF_PIN = '0504';
+const SESSION_CODE_KEY = 'cw_session_code';
+
+// ===================== PROF PIN =====================
+let profPinBuffer = '';
+function profPinKey(d) {
+  if (profPinBuffer.length >= 4) return;
+  profPinBuffer += d;
+  updatePinDots('ppd', profPinBuffer.length);
+  if (profPinBuffer.length === 4) {
+    setTimeout(() => {
+      if (profPinBuffer === PROF_PIN) {
+        profPinBuffer = '';
+        updatePinDots('ppd', 0);
+        document.getElementById('prof-pin-error').style.display = 'none';
+        showProf();
+      } else {
+        document.getElementById('prof-pin-error').style.display = 'block';
+        document.getElementById('screen-prof-pin').querySelector('.pin-wrap').classList.add('shake');
+        setTimeout(() => {
+          document.getElementById('screen-prof-pin').querySelector('.pin-wrap').classList.remove('shake');
+          profPinBuffer = '';
+          updatePinDots('ppd', 0);
+        }, 500);
+      }
+    }, 120);
+  }
+}
+function profPinDel() { if (profPinBuffer.length > 0) { profPinBuffer = profPinBuffer.slice(0, -1); updatePinDots('ppd', profPinBuffer.length); } }
+function profPinClear() { profPinBuffer = ''; updatePinDots('ppd', 0); }
+
+// ===================== STUDENT SESSION CODE =====================
+function checkStuCode() {
+  const errEl = document.getElementById('stu-code-error');
+  const inp = document.getElementById('stu-code-input');
+  const val = (inp.value || '').trim();
+  const stored = getSessionCode();
+  if (val === stored) {
+    errEl.style.display = 'none';
+    inp.value = '';
+    startStudent();
+  } else {
+    errEl.style.display = 'block';
+    inp.classList.add('shake');
+    setTimeout(() => inp.classList.remove('shake'), 400);
+  }
+}
+
+function updatePinDots(prefix, count) {
+  for (let i = 0; i < 4; i++) {
+    const el = document.getElementById(prefix + '-' + i);
+    if (el) el.classList.toggle('filled', i < count);
+  }
+}
+
+// ===================== SESSION CODE MANAGEMENT =====================
+const DEFAULT_SESSION_CODE = 'Commonwealth2627';
+
+function getSessionCode() {
+  try { return localStorage.getItem(SESSION_CODE_KEY) || DEFAULT_SESSION_CODE; } catch(e) { return DEFAULT_SESSION_CODE; }
+}
+
+function setSessionCode(code) {
+  try { localStorage.setItem(SESSION_CODE_KEY, code); } catch(e) {}
+}
+
+function displaySessionCode(code) {
+  const el = document.getElementById('session-code-display');
+  if (el) el.textContent = code || DEFAULT_SESSION_CODE;
+}
+
+function loadSessionCodeDisplay() {
+  displaySessionCode(getSessionCode());
+}
+
+// Show inline edit field
+function showEditCode() {
+  document.getElementById('session-edit-area').style.display = 'block';
+  document.getElementById('session-edit-btn-area').style.display = 'none';
+  document.getElementById('session-code-error').style.display = 'none';
+  const inp = document.getElementById('session-code-input');
+  inp.value = '';
+  setTimeout(() => inp.focus(), 80);
+}
+
+function cancelEditCode() {
+  document.getElementById('session-edit-area').style.display = 'none';
+  document.getElementById('session-edit-btn-area').style.display = 'flex';
+  document.getElementById('session-code-input').value = '';
+  document.getElementById('session-code-error').style.display = 'none';
+}
+
+function confirmNewCode() {
+  const inp = document.getElementById('session-code-input');
+  const errEl = document.getElementById('session-code-error');
+  const val = (inp.value || '').trim();
+  errEl.style.display = 'none';
+
+  if (val.length < 4) {
+    errEl.textContent = 'Le code doit contenir au moins 4 caractères.';
+    errEl.style.display = 'block';
+    inp.classList.add('shake');
+    setTimeout(() => inp.classList.remove('shake'), 400);
+    return;
+  }
+  setSessionCode(val);
+  displaySessionCode(val);
+  cancelEditCode();
+  // Flash confirmation on the display
+  const disp = document.getElementById('session-code-display');
+  if (disp) {
+    disp.style.transition = 'color 0.2s';
+    disp.style.color = '#2de0a5';
+    setTimeout(() => { disp.style.color = ''; }, 1200);
+  }
+}
+
+// ===================== QUESTION SET LOGIC =====================
+// Each country has 12 questions in ALL_Q.
+// Attempt 1,2,3 → pick a fresh random set of 12 (same pool, different order/subset possible — here all 12, shuffled differently each time).
+// Attempt 4+ → merge all 3 previous shuffled orders, deduplicate by position, re-shuffle globally.
+// Since each country has exactly 12 Qs (= full pool), we just shuffle differently each attempt.
+// We store the 3 first shuffled orders per country so attempt 4+ can remix them.
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildQuestionSet(countryId) {
+  const cid = countryId;
+  if (!S.attemptsByCountry[cid]) S.attemptsByCountry[cid] = { count: 0, sets: [] };
+  const att = S.attemptsByCountry[cid];
+  att.count++;
+
+  const pool = ALL_Q[cid]; // 12 questions
+
+  if (att.count <= 3) {
+    // New shuffle each time (guaranteed different from previous via Fisher-Yates)
+    let newSet;
+    let tries = 0;
+    do {
+      newSet = shuffle(pool);
+      tries++;
+      // Ensure it differs from last set by at least 3 positions
+    } while (tries < 20 && att.sets.length > 0 && countSimilarPositions(newSet, att.sets[att.sets.length-1]) > 9);
+    att.sets.push(newSet.map(q => q)); // store reference
+    return newSet;
+  } else {
+    // Attempt 4+: merge all 3 stored sets, flatten, deduplicate (keep first occurrence), re-shuffle
+    const seen = new Set();
+    const merged = [];
+    for (const s of att.sets) {
+      for (const q of s) {
+        const key = q.q; // question text as unique key
+        if (!seen.has(key)) { seen.add(key); merged.push(q); }
+      }
+    }
+    return shuffle(merged);
+  }
+}
+
+function countSimilarPositions(a, b) {
+  let count = 0;
+  const len = Math.min(a.length, b.length);
+  for (let i = 0; i < len; i++) if (a[i] && b[i] && a[i].q === b[i].q) count++;
+  return count;
+}
+
+// ===================== DATA =====================
+const COUNTRIES = [
+  {id:'uk',name:'Royaume-Uni',flag:'🇬🇧',color:'#1e3a5f',accent:'#3b82f6',capital:'Londres',sub:'Europe du Nord · 67 millions d\'habitants',mission:'Ta mission : percer les secrets d\'une nation aux mille traditions. De Big Ben à la Premier League, découvre le pays qui a inventé le monde moderne !'},
+  {id:'au',name:'Australie',flag:'🇦🇺',color:'#1a3d22',accent:'#22c55e',capital:'Canberra',sub:'Océanie · 26 millions d\'habitants',mission:'Ta mission : explorer le continent-île aux animaux uniques et aux paysages époustouflants. Prépare-toi à rencontrer les Aborigènes, les kangourous et l\'Opéra de Sydney !'},
+  {id:'ca',name:'Canada',flag:'🇨🇦',color:'#3d1a1a',accent:'#ef4444',capital:'Ottawa',sub:'Amérique du Nord · 38 millions d\'habitants',mission:'Ta mission : traverser l\'immense territoire du Canada, du Québec francophone aux Rocheuses enneigées. Un pays bilingue, multiculturel et fascinant t\'attend !'},
+  {id:'in',name:'Inde',flag:'🇮🇳',color:'#3d2a10',accent:'#f97316',capital:'New Delhi',sub:'Asie du Sud · 1,4 milliard d\'habitants',mission:'Ta mission : plonger dans la plus grande démocratie du monde, berceau de civilisations millénaires. Du Taj Mahal à Bollywood, l\'Inde va te surprendre à chaque étape !'},
+  {id:'nz',name:'Nouvelle-Zélande',flag:'🇳🇿',color:'#2d1a4a',accent:'#a855f7',capital:'Wellington',sub:'Océanie · 5 millions d\'habitants',mission:'Ta mission : explorer le pays du bout du monde, terre des Maoris et des hobbits. Un kiwi, un haka et des volcans t\'attendent dans cette aventure ultime !'}
+];
+
+const ALL_Q = {
+uk:[
+  {c:'geo',cl:'Géographie',q:'Quelle est la capitale du Royaume-Uni ?',h:'Elle est traversée par la Tamise.',ch:['Manchester','Londres','Édimbourg','Cardiff'],a:1,info:'Londres est une mégapole de 9 millions d\'habitants. Elle est traversée par la Tamise et abrite des monuments comme Tower Bridge et Buckingham Palace.'},
+  {c:'hist',cl:'Histoire',q:'En quelle année la Bataille de Hastings marqua-t-elle la conquête normande de l\'Angleterre ?',h:'C\'est au XIe siècle.',ch:['1066','1215','1485','1588'],a:0,info:'En 1066, Guillaume le Conquérant bat Harold II. Cet événement introduit des centaines de mots français dans la langue anglaise !'},
+  {c:'mon',cl:'Monuments',q:'Comment s\'appelle le monument préhistorique fait de gigantesques pierres dressées dans le sud de l\'Angleterre ?',h:'Son nom évoque des pierres suspendues.',ch:['Carnac','Stonehenge','Avebury','Callanish'],a:1,info:'Stonehenge a été construit il y a 5 000 ans. Son utilité reste mystérieuse : observatoire astronomique, lieu de culte ou cimetière ? Les pierres pèsent jusqu\'à 25 tonnes.'},
+  {c:'soc',cl:'Société',q:'Quel est le sport le plus populaire au Royaume-Uni, dont la ligue est la plus regardée au monde ?',h:'Il se joue avec un ballon rond.',ch:['Rugby','Cricket','Football','Tennis'],a:2,info:'La Premier League est suivie dans 188 pays avec 4,7 milliards de téléspectateurs potentiels. Les clubs comme Manchester United ou Liverpool sont connus partout.'},
+  {c:'geo',cl:'Géographie',q:'Combien de nations composent le Royaume-Uni ?',h:'Pense à l\'Angleterre, l\'Écosse et leurs voisines.',ch:['2','3','4','5'],a:2,info:'Le Royaume-Uni regroupe l\'Angleterre, l\'Écosse, le Pays de Galles et l\'Irlande du Nord. Chaque nation a sa propre identité, ses traditions et parfois son parlement.'},
+  {c:'hist',cl:'Histoire',q:'Quelle reine régna 70 ans sur le Royaume-Uni, décédée en 2022 ?',h:'Son fils Charles III lui a succédé.',ch:['Élisabeth I','Victoria','Élisabeth II','Mary I'],a:2,info:'La reine Élisabeth II régna de 1952 à 2022 — un record absolu. Elle fut un symbole de stabilité et de continuité pour le pays et le Commonwealth.'},
+  {c:'mon',cl:'Monuments',q:'Quelle forteresse médiévale londonienne, jadis prison royale, garde aujourd\'hui les joyaux de la Couronne ?',h:'Guillaume le Conquérant l\'a construite en 1066.',ch:['Buckingham Palace','La Tour de Londres','Westminster Abbey','Hampton Court'],a:1,info:'La Tour de Londres servit de palais, de prison (Anne Boleyn y fut décapitée), d\'arsenal et de zoo. Elle est classée au patrimoine mondial de l\'UNESCO.'},
+  {c:'soc',cl:'Société',q:'Quelle boisson chaude est un rituel social incontournable au Royaume-Uni, consommée à toute heure ?',h:'On la sert avec du lait et des biscuits.',ch:['Café','Thé','Chocolat chaud','Cidre'],a:1,info:'Les Britanniques consomment 100 millions de tasses de thé par jour ! Le "tea time" de 17h est une institution nationale introduite au XVIIe siècle.'},
+  {c:'geo',cl:'Géographie',q:'Comment s\'appelle le tunnel sous la Manche reliant le Royaume-Uni à la France depuis 1994 ?',h:'Il est parfois surnommé "le Chunnel".',ch:['Tunnel Atlantique','EuroTunnel','Tunnel Transmanche','Tunnel Dover'],a:1,info:'L\'EuroTunnel mesure 50 km dont 38 sous la mer. Le voyage en Eurostar entre Londres et Paris dure environ 2h15. C\'est un exploit d\'ingénierie du XXe siècle.'},
+  {c:'hist',cl:'Histoire',q:'Quel document signé en 1215 est considéré comme l\'ancêtre des droits de l\'homme ?',h:'Son nom latin signifie "Grande Charte".',ch:['Bill of Rights','Magna Carta','Domesday Book','Act of Union'],a:1,info:'La Magna Carta, signée par le roi Jean Sans Terre, limite pour la première fois le pouvoir royal. Elle pose les bases du droit à un procès équitable — texte fondateur de la démocratie.'},
+  {c:'soc',cl:'Société',q:'Quel écrivain britannique du XIXe siècle a créé les personnages de Sherlock Holmes et du Docteur Watson ?',h:'Son prénom est Arthur.',ch:['Charles Dickens','Arthur Conan Doyle','Oscar Wilde','Rudyard Kipling'],a:1,info:'Arthur Conan Doyle (1859-1930) créa Sherlock Holmes en 1887. Le détective est devenu le personnage fictif le plus adapté au cinéma et à la télévision. Son adresse fictive, 221B Baker Street, attire des milliers de touristes chaque année.'},
+  {c:'mon',cl:'Monuments',q:'Quel célèbre auteur de romans policiers britannique, née à Torquay, a créé Hercule Poirot ?',h:'C\'est une femme, l\'autrice la plus vendue au monde.',ch:['J.K. Rowling','Agatha Christie','Jane Austen','Virginia Woolf'],a:1,info:'Agatha Christie est l\'autrice la plus vendue de tous les temps avec 2 milliards d\'exemplaires. "Dix Petits Nègres" est le roman policier le plus vendu au monde.'}
+],
+au:[
+  {c:'geo',cl:'Géographie',q:'Quelle est la capitale de l\'Australie ?',h:'Ce n\'est ni Sydney ni Melbourne — une ville planifiée.',ch:['Sydney','Melbourne','Canberra','Brisbane'],a:2,info:'Canberra fut construite à partir de 1913 pour résoudre la rivalité entre Sydney et Melbourne. Son nom viendrait d\'un mot aborigène signifiant "lieu de rencontre".'},
+  {c:'hist',cl:'Histoire',q:'En quelle année l\'explorateur britannique James Cook aborda-t-il la côte est de l\'Australie ?',h:'C\'est dans la seconde moitié du XVIIIe siècle.',ch:['1688','1770','1801','1851'],a:1,info:'James Cook arriva en 1770 et revendiqua la côte pour la Couronne. Les Aborigènes peuplaient pourtant le continent depuis 65 000 ans — la vraie "découverte" date de bien avant !'},
+  {c:'mon',cl:'Monuments',q:'Quel édifice de Sydney, classé au patrimoine mondial de l\'UNESCO, ressemble à des voiles de navire ?',h:'Il accueille opéras, concerts et théâtres.',ch:['Sydney Harbour Bridge','Opéra de Sydney','Luna Park','Hyde Park Barracks'],a:1,info:'L\'Opéra de Sydney, conçu par l\'architecte danois Jørn Utzon, fut construit de 1959 à 1973. Il accueille chaque année plus de 1 500 représentations et 1,2 million de spectateurs.'},
+  {c:'soc',cl:'Société',q:'Comment appelle-t-on les habitants autochtones d\'Australie, dont la culture est la plus ancienne au monde ?',h:'Leur nom vient du latin "ab origine" (depuis l\'origine).',ch:['Maoris','Inuits','Aborigènes','Mélanésiens'],a:2,info:'Les Aborigènes ont une histoire de 65 000 ans — la culture humaine vivante la plus ancienne. Ils possèdent plus de 250 langues et une connexion spirituelle profonde avec la terre.'},
+  {c:'geo',cl:'Géographie',q:'Quel est le plus grand rocher monolithique du monde, sacré pour les Aborigènes, situé au centre de l\'Australie ?',h:'Il change de couleur au coucher du soleil.',ch:['Mont Kosciuszko','Uluru (Ayers Rock)','Devils Marbles','Mount Augustus'],a:1,info:'Uluru est un rocher de grès rouge de 348 mètres de haut. Sacré pour le peuple Anangu, l\'accès à son sommet est interdit depuis 2019 par respect pour cette culture.'},
+  {c:'hist',cl:'Histoire',q:'Quel célèbre débarquement militaire australien en 1915, commémoré chaque 25 avril, est un symbole de l\'identité nationale ?',h:'Il se déroula dans les Dardanelles, en Turquie.',ch:['Débarquement de Normandie','Bataille de Gallipoli','Bataille de Singapour','Bataille de Kokoda'],a:1,info:'La Bataille de Gallipoli (1915) forgea l\'identité australienne. L\'ANZAC Day, le 25 avril, est le jour de commémoration le plus important du pays.'},
+  {c:'nat',cl:'Nature',q:'Quel animal d\'Australie figure sur les armoiries nationales et ne peut pas reculer ?',h:'Il saute et porte ses petits dans une poche.',ch:['Koala','Wombat','Kangourou','Platypus'],a:2,info:'L\'Australie compte 50 millions de kangourous, soit plus que d\'habitants ! Il figure sur les armoiries car, ne pouvant pas reculer, il symbolise l\'avancée permanente.'},
+  {c:'soc',cl:'Société',q:'Quel sport, né à Melbourne en 1858, est unique au monde et le plus populaire dans le sud de l\'Australie ?',h:'Les joueurs utilisent mains et pieds avec un ballon ovale.',ch:['Rugby à XIII','Cricket','Football australien (AFL)','Netball'],a:2,info:'L\'AFL est un sport unique mêlant rugby, football et gaélique. La finale annuelle (Grand Final) réunit 100 000 spectateurs au Melbourne Cricket Ground.'},
+  {c:'geo',cl:'Géographie',q:'Quelle est la plus grande structure vivante de la planète, visible depuis l\'espace, au large de l\'Australie ?',h:'Elle est menacée par le réchauffement climatique.',ch:['Forêt Amazonienne','Grande Barrière de Corail','Récif de la Mer Rouge','Atoll de Bikini'],a:1,info:'La Grande Barrière de Corail s\'étend sur 2 300 km et abrite 1 500 espèces de poissons. Classée au patrimoine mondial, elle est menacée par le réchauffement des océans.'},
+  {c:'hist',cl:'Histoire',q:'En quelle année le premier convoi de bagnards britanniques arriva-t-il en Australie ?',h:'C\'est peu après la "découverte" de Cook.',ch:['1770','1788','1800','1820'],a:1,info:'En 1788, 736 forçats britanniques arrivèrent à Port Jackson (Sydney). Environ 165 000 prisonniers furent déportés jusqu\'en 1868. Beaucoup d\'Australiens descendent de ces colons.'},
+  {c:'nat',cl:'Nature',q:'Quel animal australien est un mammifère, pond des œufs, a un bec de canard et un venin ?',h:'Les naturalistes du XVIIIe siècle croyaient à une farce.',ch:['Échidné','Ornithorynque','Diable de Tasmanie','Quokka'],a:1,info:'L\'ornithorynque est l\'un des animaux les plus étranges au monde : mammifère ovipare avec un bec de canard, une queue de castor et un ergot venimeux. Les mâles peuvent tuer un chien avec leur venin !'},
+  {c:'soc',cl:'Société',q:'Quel surnom affectueux désigne les Australiens dans le monde entier ?',h:'Ce mot vient de l\'abréviation d\'"Australian".',ch:['Koalas','Kiwis','Wallabies','Aussies'],a:3,info:'"Aussie" (prononcé "Ozzie") est le surnom universel des Australiens. Ils sont réputés pour leur accent unique, leur humour et leur culture du barbecue en plein air.'}
+],
+ca:[
+  {c:'geo',cl:'Géographie',q:'Quelle est la capitale fédérale du Canada ?',h:'Ce n\'est ni Toronto ni Montréal.',ch:['Toronto','Vancouver','Ottawa','Montréal'],a:2,info:'Ottawa est la capitale depuis 1857. Bilingue anglais-français, elle abrite le Parlement, la Cour suprême et de nombreuses institutions fédérales.'},
+  {c:'hist',cl:'Histoire',q:'Quel explorateur français fonda la ville de Québec en 1608 ?',h:'Son nom figure sur de nombreux lieux au Canada.',ch:['Jacques Cartier','Samuel de Champlain','Louis Hébert','Jean Talon'],a:1,info:'Samuel de Champlain (1574-1635), "père de la Nouvelle-France", fonda Québec sur les rives du Saint-Laurent. Il établit des alliances avec les nations autochtones Huron-Wendat.'},
+  {c:'mon',cl:'Monuments',q:'Dans quelle ville se trouve le château Frontenac, l\'un des hôtels les plus photographiés au monde ?',h:'Cette ville fortifiée est un joyau du patrimoine francophone.',ch:['Montréal','Toronto','Ottawa','Québec'],a:3,info:'Le Château Frontenac (1893) domine la ville de Québec depuis la falaise. La Vieille-Capitale est la seule ville fortifiée d\'Amérique du Nord au nord du Mexique, classée UNESCO.'},
+  {c:'soc',cl:'Société',q:'Quelles sont les deux langues officielles du Canada ?',h:'L\'une est parlée surtout au Québec.',ch:['Anglais + espagnol','Anglais + inuktitut','Anglais + français','Français + portugais'],a:2,info:'Le Canada est officiellement bilingue depuis 1969. Le Québec est la seule province francophone à 80%. À Ottawa, tous les services fédéraux sont offerts dans les deux langues.'},
+  {c:'nat',cl:'Nature',q:'Quelle feuille figure sur le drapeau canadien ?',h:'Un sirop délicieux en est extrait.',ch:['Feuille de chêne','Feuille d\'érable','Feuille de bouleau','Feuille de pin'],a:1,info:'La feuille d\'érable rouge est le symbole national depuis 1965. Le Canada produit 71% du sirop d\'érable mondial, principalement au Québec où la "saison des sucres" est une tradition.'},
+  {c:'geo',cl:'Géographie',q:'Le Canada est le 2e plus grand pays du monde. Quel pays le dépasse en superficie ?',h:'Ce pays est en Eurasie.',ch:['États-Unis','Chine','Russie','Australie'],a:2,info:'La Russie couvre 17,1 M km² contre 9,98 M km² pour le Canada. Malgré son immensité, 90% des Canadiens vivent à moins de 200 km de la frontière américaine.'},
+  {c:'hist',cl:'Histoire',q:'En quelle année des soldats canadiens débarquèrent-ils en Normandie lors du D-Day ?',h:'C\'est l\'une des dates les plus connues de l\'Histoire.',ch:['1942','1943','1944','1945'],a:2,info:'Le 6 juin 1944, les Canadiens débarquèrent sur la plage "Juno" et furent les plus avancés de tous les Alliés. Le cimetière canadien de Bény-sur-Mer, en Normandie, abrite 2 048 soldats.'},
+  {c:'soc',cl:'Société',q:'Quel sport sur glace est considéré comme le sport national d\'hiver du Canada ?',h:'Les Canadiens y excellent depuis des décennies.',ch:['Curling','Patinage artistique','Hockey sur glace','Ski alpin'],a:2,info:'Le hockey est une religion au Canada. La LNH est la ligue la plus suivie. Le Canadien de Montréal est le club qui a remporté le plus de championnats dans l\'histoire de la ligue.'},
+  {c:'mon',cl:'Monuments',q:'Comment s\'appellent les célèbres chutes situées à la frontière Canada-États-Unis ?',h:'Elles portent le nom d\'une nation autochtone iroquoise.',ch:['Chutes Victoria','Chutes Iguazu','Chutes du Niagara','Chutes Angel'],a:2,info:'Les chutes du Niagara attirent 13 millions de visiteurs par an. Situées entre l\'Ontario et New York, leur débit est de 2 400 m³ par seconde. Elles sont utilisées pour produire de l\'énergie.'},
+  {c:'geo',cl:'Géographie',q:'Quelle province canadienne est la seule à avoir le français comme seule langue officielle ?',h:'Sa métropole s\'appelle Montréal.',ch:['Ontario','Nouveau-Brunswick','Québec','Manitoba'],a:2,info:'Le Québec est la plus grande province par la superficie. Fondé par les Français au XVIIe siècle, il a préservé sa langue et sa culture distincte malgré la domination anglophone autour.'},
+  {c:'soc',cl:'Société',q:'Quel terme décrit la politique canadienne qui valorise toutes les cultures sans en imposer une seule ?',h:'C\'est le contraire de l\'assimilation.',ch:['Intégration','Multiculturalisme','Assimilation','Melting-pot'],a:1,info:'Le Canada est l\'un des pays les plus multiculturels du monde. Sa politique officielle, inscrite dans la loi depuis 1988, encourage le maintien des identités culturelles. Toronto compte 200 langues parlées.'},
+  {c:'hist',cl:'Histoire',q:'Quelle nation autochtone, parmi les plus influentes du Canada, habitait les Grandes Plaines ?',h:'Leur culture vit toujours à travers les pow-wows.',ch:['Inuits','Cris','Iroquois','Hurons'],a:1,info:'Les Cris sont l\'un des peuples autochtones les plus nombreux avec 200 000 personnes. Leurs pow-wows (cérémonies culturelles) et leurs langues sont encore vivants aujourd\'hui.'}
+],
+in:[
+  {c:'geo',cl:'Géographie',q:'Quelle est la capitale de l\'Inde ?',h:'Son nom complet est "Nouvelle-Delhi".',ch:['Mumbai','Kolkata','New Delhi','Chennai'],a:2,info:'New Delhi est la capitale depuis 1931. Elle fait partie de la région métropolitaine de Delhi (32 M d\'hab.), l\'une des plus grandes mégapoles du monde.'},
+  {c:'mon',cl:'Monuments',q:'Quel mausolée en marbre blanc, construit au XVIIe siècle, est l\'une des 7 merveilles du monde ?',h:'L\'empereur moghol l\'a construit pour son épouse.',ch:['Fort Rouge','Qutb Minar','Taj Mahal','Temple d\'Or'],a:2,info:'Le Taj Mahal fut construit par Shah Jahan entre 1632 et 1653. 20 000 ouvriers y travaillèrent. Il change de couleur selon la lumière : rose à l\'aube, blanc le jour, doré au clair de lune.'},
+  {c:'hist',cl:'Histoire',q:'Quel leader pacifiste dirigea la lutte pour l\'indépendance de l\'Inde face aux Britanniques ?',h:'Sa philosophie de non-violence inspira Martin Luther King.',ch:['Jawaharlal Nehru','Subhas Chandra Bose','Muhammad Ali Jinnah','Mahatma Gandhi'],a:3,info:'Mahatma Gandhi (1869-1948) dirigea la résistance non-violente. L\'Inde obtint son indépendance le 15 août 1947. Sa méthode de "désobéissance civile" inspira des mouvements dans le monde entier.'},
+  {c:'soc',cl:'Société',q:'Quel cinéma, produit à Mumbai, est le plus grand du monde en nombre de films par an ?',h:'Son nom est un mélange de deux noms de villes.',ch:['Nollywood','Tollywood','Hollywood','Bollywood'],a:3,info:'Bollywood produit plus de 1 000 films par an, plus qu\'Hollywood. Les films indiens sont regardés par 1,5 milliard de personnes. Ils sont connus pour leurs danses colorées et leurs histoires épiques.'},
+  {c:'geo',cl:'Géographie',q:'L\'Inde est le pays le plus peuplé du monde depuis 2023. Combien d\'habitants compte-t-elle ?',h:'Elle a dépassé la Chine récemment.',ch:['800 millions','1,1 milliard','1,4 milliard','2 milliards'],a:2,info:'En 2023, l\'Inde a dépassé la Chine avec 1,4 milliard d\'habitants. Sa population est très jeune (âge médian : 28 ans). D\'ici 2050, elle pourrait atteindre 1,7 milliard.'},
+  {c:'hist',cl:'Histoire',q:'Quelle ancienne civilisation de la vallée de l\'Indus, florissante il y a 4 500 ans, avait déjà des égouts ?',h:'Ses villes s\'appelaient Mohenjo-daro et Harappa.',ch:['Civilisation mésopotamienne','Civilisation harappéenne','Civilisation védique','Civilisation dravidienne'],a:1,info:'La civilisation de l\'Indus (3300-1300 av. J.-C.) avait des systèmes d\'égouts et de bains publics plus sophistiqués que Rome deux millénaires plus tard !'},
+  {c:'mon',cl:'Monuments',q:'Quel monument de Delhi, construit en grès rouge par Shah Jahan en 1638, était la résidence des empereurs moghols ?',h:'Sa couleur lui a donné son nom.',ch:['Taj Mahal','Fort d\'Agra','Fort Rouge','Qutb Minar'],a:2,info:'Le Fort Rouge de Delhi abrite la célébration du Jour de l\'Indépendance (15 août) où le Premier ministre hisse le drapeau national depuis les remparts.'},
+  {c:'soc',cl:'Société',q:'Quelle fête des lumières indienne symbolise la victoire du bien sur le mal ?',h:'On y allume des lampions et tire des feux d\'artifice.',ch:['Holi','Diwali','Eid','Navratri'],a:1,info:'Diwali est célébrée chaque automne. Les familles décorent leurs maisons de lampions (diyas) et partagent des sucreries. Elle symbolise le retour du dieu Rama après sa victoire sur le démon Ravana.'},
+  {c:'geo',cl:'Géographie',q:'Quelle chaîne de montagnes, la plus haute du monde, borde l\'Inde au nord et abrite l\'Everest ?',h:'Son nom signifie "demeure des neiges" en sanskrit.',ch:['Karakoram','Hindu Kush','Himalaya','Vindhya'],a:2,info:'L\'Himalaya s\'étend sur 2 400 km à travers l\'Inde, le Népal, le Bhoutan, la Chine et le Pakistan. Il abrite les 14 plus hauts sommets de la planète, dont l\'Everest (8 849 m).'},
+  {c:'hist',cl:'Histoire',q:'Quelle compagnie commerciale britannique (EIC) contrôla une grande partie de l\'Inde avant 1858 ?',h:'Elle avait sa propre armée de 200 000 soldats.',ch:['Compagnie des Indes orientales','Compagnie Royale Africaine','Hudson\'s Bay Company','Virginia Company'],a:0,info:'La Compagnie des Indes orientales (fondée en 1600) gouverna l\'Inde pendant 250 ans. Son monopole prit fin après la révolte des Cipayes de 1857, et l\'Inde devint une colonie directe.'},
+  {c:'soc',cl:'Société',q:'Quel sport, introduit par les Britanniques, est aujourd\'hui une religion en Inde avec 1 milliard de fans ?',h:'Il se joue avec une batte et une balle.',ch:['Football','Rugby','Polo','Cricket'],a:3,info:'Le cricket est une passion nationale. La BCCI est l\'organisation sportive la plus riche du monde. Les matchs internationaux peuvent réunir un milliard de téléspectateurs rien qu\'en Inde !'},
+  {c:'mon',cl:'Monuments',q:'Dans quelle ville se trouve le Temple d\'Or, lieu saint le plus sacré de la religion sikh ?',h:'Elle est aussi connue pour son industrie textile.',ch:['Mumbai','Varanasi','Amritsar','Jaipur'],a:2,info:'Le Temple d\'Or d\'Amritsar est plaqué d\'or pur et accueille 100 000 visiteurs par jour. Il offre un repas gratuit à tous — le "langar" — sans distinction de religion, de caste ou de richesse.'}
+],
+nz:[
+  {c:'geo',cl:'Géographie',q:'Quelle est la capitale de la Nouvelle-Zélande ?',h:'Ce n\'est pas Auckland, la plus grande ville.',ch:['Auckland','Christchurch','Dunedin','Wellington'],a:3,info:'Wellington, surnommée "Windy Wellington", est la capitale depuis 1865. Elle abrite le Parlement (Te Whare Pāremata) et le musée national Te Papa.'},
+  {c:'hist',cl:'Histoire',q:'Comment s\'appelle le peuple autochtone de Nouvelle-Zélande, arrivé de Polynésie il y a environ 700 ans ?',h:'Leur danse de guerre est connue dans le monde entier.',ch:['Aborigènes','Maoris','Polynésiens','Mélanésiens'],a:1,info:'Les Maoris arrivèrent entre 1250 et 1300. Leur langue, le Te Reo Māori, est co-officielle depuis 1987. Ils représentent 17% de la population et leur culture est au cœur de l\'identité nationale.'},
+  {c:'mon',cl:'Monuments',q:'Dans quelle région se trouve "Hobbiton", le village des Hobbits reconstitué pour les films du Seigneur des Anneaux ?',h:'C\'est dans la région de Waikato, île du Nord.',ch:['Wellington','Auckland','Matamata','Hamilton'],a:2,info:'Hobbiton, à Matamata, attire des centaines de milliers de touristes par an. La Nouvelle-Zélande est surnommée "Middle-Earth" grâce à ses paysages utilisés dans les trilogies de Peter Jackson.'},
+  {c:'soc',cl:'Société',q:'La Nouvelle-Zélande fut le premier pays du monde à accorder le droit de vote aux femmes. En quelle année ?',h:'C\'est à la fin du XIXe siècle.',ch:['1869','1893','1917','1928'],a:1,info:'En 1893, la Nouvelle-Zélande devint le premier pays à accorder le droit de vote aux femmes grâce au combat de Kate Sheppard. Son portrait figure sur le billet de 10 dollars néo-zélandais.'},
+  {c:'nat',cl:'Nature',q:'Quel oiseau, symbole national de la Nouvelle-Zélande, est incapable de voler et actif la nuit ?',h:'Son nom est aussi le surnom des Néo-Zélandais.',ch:['Kakapo','Émeu','Albatros','Kiwi'],a:3,info:'Le kiwi a les narines au bout du bec, des plumes comme des poils, et ses œufs représentent 20% de son poids. "Kiwi" est le surnom affectueux des Néo-Zélandais.'},
+  {c:'geo',cl:'Géographie',q:'De combien d\'îles principales la Nouvelle-Zélande est-elle composée ?',h:'C\'est simple : une au Nord, une au Sud.',ch:['1','2','3','4'],a:1,info:'L\'Île du Nord abrite 77% de la population et Wellington. L\'Île du Sud, plus montagneuse, abrite les Alpes du Sud et les fjords. Une troisième île, Stewart Island, est encore plus au sud.'},
+  {c:'hist',cl:'Histoire',q:'Quel traité signé en 1840 entre la Couronne britannique et les chefs maoris est le document fondateur de la Nouvelle-Zélande ?',h:'Son nom est celui d\'un lieu dans le Northland.',ch:['Traité de Waitangi','Charte de Wellington','Acte de Auckland','Pacte de Christchurch'],a:0,info:'Le Traité de Waitangi (6 février 1840) accordait la souveraineté à la Couronne en échange de la protection des droits maoris. Son interprétation reste un enjeu politique central aujourd\'hui.'},
+  {c:'soc',cl:'Société',q:'Quel sport emblématique voit l\'équipe nationale (les "All Blacks") réaliser le haka avant les matchs ?',h:'Ce sport se joue avec un ballon ovale.',ch:['Football australien','Cricket','Rugby à XV','Netball'],a:2,info:'Les All Blacks ont plus de 77% de victoires dans leur histoire — le meilleur bilan de tous les sports collectifs au monde. Leur haka "Ka Mate" est un défi de force et de fierté culturelle maorie.'},
+  {c:'nat',cl:'Nature',q:'Quelle ville de la Nouvelle-Zélande est célèbre pour ses geysers, ses sources chaudes et ses boues bouillonnantes ?',h:'La ville sent l\'œuf pourri à cause du soufre.',ch:['Wellington','Auckland','Rotorua','Queenstown'],a:2,info:'Rotorua repose sur une caldeira volcanique. Les Maoris utilisaient ces sources pour cuisiner et se chauffer. Le geyser Pohutu jaillit jusqu\'à 30 mètres de haut !'},
+  {c:'geo',cl:'Géographie',q:'Quelle chaîne de montagnes traverse l\'Île du Sud et culmine au Mont Cook (Aoraki) ?',h:'Leur nom évoque les Alpes européennes.',ch:['Monts Ruapehu','Alpes du Sud','Chaîne Kaikoura','Southern Downs'],a:1,info:'Les Alpes du Sud s\'étendent sur 500 km. Edmund Hillary, premier grimpeur de l\'Everest en 1953, s\'y entraîna. La région abrite aussi le glacier Franz Josef et le lac Tekapo aux eaux turquoise.'},
+  {c:'hist',cl:'Histoire',q:'Quel explorateur britannique fut le premier Européen à cartographier la Nouvelle-Zélande, en 1769 ?',h:'Il navigua aussi vers l\'Australie la même année.',ch:['Francis Drake','Abel Tasman','James Cook','Matthew Flinders'],a:2,info:'James Cook explora et cartographia la Nouvelle-Zélande lors de son premier voyage (1769-1770). L\'explorateur néerlandais Abel Tasman les avait aperçues en 1642, sans débarquer.'},
+  {c:'soc',cl:'Société',q:'En quelle année la Nouvelle-Zélande légalisa-t-elle le mariage pour tous, premier pays d\'Asie-Pacifique à le faire ?',h:'C\'est dans la première moitié des années 2010.',ch:['2010','2011','2013','2015'],a:2,info:'En avril 2013, lors du vote au Parlement, les galeries publiques entonnèrent spontanément une chanson d\'amour traditionnelle maorie — un moment historique très émouvant, retransmis dans le monde entier.'}
+]
+};
+
+const MAX_PER_COUNTRY = 180;
+const TOTAL_MAX = 900;
+
+// ===================== STATE =====================
+let S = {
+  studentName:'', studentClass:'', currentCountryIdx:null, countryResults:{}, totalScore:0,
+  attemptsByCountry:{}, // tracks attempt count per country id
+  qIdx:0, lives:5, streak:0, timerVal:0, timerInt:null, answered:false, firstTry:true,
+  currentQSet:[], attemptsByCountry:{}
+};
+
+// ===================== SCREENS =====================
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el = document.getElementById('screen-'+id);
+  if(el) el.classList.add('active');
+  window.scrollTo(0,0);
+  // Show/hide PDF FAB
+  const fabScreens = ['map','game','country-end','country-intro','student-progress','final','saved-game'];
+  const fab = document.getElementById('pdf-fab');
+  if(fab) fab.style.display = (S.studentName && fabScreens.includes(id)) ? 'block' : 'none';
+}
+
+// ===================== STUDENT FLOW =====================
+function startStudent(){ showScreen('student-name');  }
+
+function updatePreview(){
+  const p=(document.getElementById('input-prenom').value||'').replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,2);
+  const n=(document.getElementById('input-nom').value||'').replace(/[^a-zA-Z]/g,'').toUpperCase().slice(0,2);
+  const cl=(document.getElementById('input-classe').value||'').trim().toUpperCase();
+  const prev=document.getElementById('ident-preview');
+  const code=document.getElementById('ident-code');
+  if(p.length===2&&n.length===2){
+    prev.style.display='block';
+    code.textContent=p+'-'+n+(cl?' · '+cl:'');
+  } else { prev.style.display='none'; }
+}
+
+function confirmName(){
+  const errEl=document.getElementById('ident-error');
+  errEl.style.display='none';
+  const p=(document.getElementById('input-prenom').value||'').replace(/[^a-zA-Z]/g,'').toUpperCase();
+  const n=(document.getElementById('input-nom').value||'').replace(/[^a-zA-Z]/g,'').toUpperCase();
+  const cl=(document.getElementById('input-classe').value||'').trim().toUpperCase();
+  if(p.length!==2){
+    errEl.textContent='Le prénom doit comporter exactement 2 lettres.';
+    errEl.style.display='block';
+    document.getElementById('input-prenom').classList.add('shake');
+    setTimeout(()=>document.getElementById('input-prenom').classList.remove('shake'),400);
+    return;
+  }
+  if(n.length!==2){
+    errEl.textContent='Le nom doit comporter exactement 2 lettres.';
+    errEl.style.display='block';
+    document.getElementById('input-nom').classList.add('shake');
+    setTimeout(()=>document.getElementById('input-nom').classList.remove('shake'),400);
+    return;
+  }
+  if(!cl){
+    errEl.textContent='Merci d\'indiquer ta classe.';
+    errEl.style.display='block';
+    document.getElementById('input-classe').classList.add('shake');
+    setTimeout(()=>document.getElementById('input-classe').classList.remove('shake'),400);
+    return;
+  }
+  const code=p+'-'+n;
+  // Check for existing save
+  const saved = loadSavedGame(code, cl);
+  if(saved && saved.countryResults && Object.keys(saved.countryResults).length > 0){
+    // Show saved game screen
+    S.studentName=code; S.studentClass=cl;
+    showSavedGameScreen(saved);
+  } else {
+    S.studentName=code; S.studentClass=cl; S.countryResults={}; S.totalScore=0; S.attemptsByCountry={};
+    buildMap(); showScreen('map');
+  }
+}
+
+function showSavedGameScreen(saved){
+  const box = document.getElementById('saved-game-box');
+  const doneCountries = Object.values(saved.countryResults||{}).filter(r=>r.done).length;
+  const allD = Object.values(saved.countryResults||{}).flatMap(r=>r.details||[]);
+  const totalCorrect = allD.filter(d=>d.correct).length;
+  const pct = allD.length > 0 ? Math.round(totalCorrect/allD.length*100) : 0;
+  const date = saved.savedAt ? new Date(saved.savedAt).toLocaleDateString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+  // Country progress lines
+  let countryLines = '';
+  COUNTRIES.forEach(c=>{
+    const r = saved.countryResults?.[c.id];
+    const done = r?.done;
+    const pts = Math.round(r?.score||0);
+    const icon = done ? '✓' : r?.details?.length > 0 ? '…' : '·';
+    const col = done ? '#9fdcaa' : r?.details?.length > 0 ? 'var(--amber)' : 'var(--text3)';
+    countryLines += `<span style="margin-right:10px;color:${col};font-size:12px">${icon} ${c.flag} ${c.name}${done?' ('+pts+' pts)':''}</span>`;
+  });
+  box.innerHTML = `
+    <div class="save-resume-title">✦ Progression sauvegardée</div>
+    <div class="save-resume-code">${saved.name} <span style="font-size:14px;color:var(--text3)">· ${saved.classe}</span></div>
+    <div class="save-resume-meta">Dernière session : ${date}</div>
+    <div style="margin:10px 0 6px;height:1px;background:rgba(160,110,30,0.15)"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-family:'Cinzel',serif;font-size:18px;color:var(--gold)">${Math.round(saved.totalScore||0)} pts</span>
+      <span style="font-family:'Special Elite',monospace;font-size:11px;color:var(--text3)">${doneCountries}/5 pays · ${pct}% réussite</span>
+    </div>
+    <div style="font-family:'Crimson Text',serif;font-size:13px;line-height:1.9;flex-wrap:wrap;display:flex">${countryLines}</div>`;
+  document.getElementById('reset-confirm-area').style.display='none';
+  showScreen('saved-game');
+}
+
+function resumeSavedGame(){
+  const saved = loadSavedGame(S.studentName, S.studentClass);
+  if(!saved) { buildMap(); showScreen('map'); return; }
+  S.countryResults = saved.countryResults || {};
+  S.totalScore = saved.totalScore || 0;
+  S.attemptsByCountry = saved.attemptsByCountry || {};
+  buildMap(); showScreen('map');
+}
+
+function confirmResetSaved(){
+  document.getElementById('reset-confirm-area').style.display='block';
+}
+
+function doResetSaved(){
+  deleteSavedGame(S.studentName, S.studentClass);
+  S.countryResults={}; S.totalScore=0; S.attemptsByCountry={};
+  buildMap(); showScreen('map');
+}
+
+function buildMap(){
+  document.getElementById('map-name').textContent = S.studentName+' · '+S.studentClass;
+  document.getElementById('map-score-pill').textContent = Math.round(S.totalScore)+' pts';
+  const g = document.getElementById('world-grid'); g.innerHTML='';
+  let doneQ=0;
+  COUNTRIES.forEach((c,i)=>{
+    const r = S.countryResults[c.id];
+    const done = r?.done;
+    const locked = i>0 && !S.countryResults[COUNTRIES[i-1].id]?.done;
+    if(done) doneQ+=12;
+    const div=document.createElement('div');
+    div.className='country-card'+(done?' done':'')+(locked?' locked':'')+((!done&&!locked)?' current-active':'');
+    div.innerHTML=`<div class="cc-flag">${c.flag}</div><div class="cc-name">${c.name}</div><div class="cc-pts">${done?Math.round(r.score)+' pts':locked?'🔒':'▶ Jouer'}</div>`;
+    if(!locked) div.onclick=()=>openCountry(i);
+    g.appendChild(div);
+  });
+  const pct=Math.round(doneQ/60*100);
+  document.getElementById('global-prog-fill').style.width=pct+'%';
+  document.getElementById('global-prog-label').textContent=doneQ+' / 60';
+  if(doneQ===60) setTimeout(showFinalScreen,400);
+}
+
+function openCountry(idx){
+  S.currentCountryIdx=idx;
+  const c=COUNTRIES[idx];
+  const ci=document.getElementById('ci-banner');
+  ci.style.background=c.color;
+  document.getElementById('ci-flag').textContent=c.flag;
+  document.getElementById('ci-name').textContent=c.name; document.getElementById('ci-name').style.color=c.accent;
+  document.getElementById('ci-sub').textContent=c.sub;
+  document.getElementById('ci-mission').textContent=c.mission;
+  const cats=[...new Set(ALL_Q[c.id].map(q=>q.c))];
+  const cmap={geo:'tag-geo',hist:'tag-hist',soc:'tag-soc',mon:'tag-mon',nat:'tag-nat'};
+  const cname={geo:'Géographie',hist:'Histoire',soc:'Société',mon:'Monuments',nat:'Nature'};
+  document.getElementById('ci-cats').innerHTML=cats.map(cat=>`<span class="tag ${cmap[cat]}">${cname[cat]}</span>`).join('');
+  showScreen('country-intro');
+}
+
+function startCountry(isRetry=false){
+  const c=COUNTRIES[S.currentCountryIdx];
+  if (!isRetry) {
+    // Fresh start: reset attempt tracker for this country
+    if (S.attemptsByCountry[c.id]) delete S.attemptsByCountry[c.id];
+  }
+  S.qIdx=0; S.lives=5; S.streak=0;
+  S.currentQSet = buildQuestionSet(c.id);
+  S.countryResults[c.id]={score:0,done:false,details:[],attempt:S.attemptsByCountry[c.id].count};
+  showScreen('game'); loadQ();
+}
+
+function retryCountry(){ startCountry(true); }
+
+// ===================== GAME =====================
+function loadQ(){
+  if(S.qIdx>=12){endCountry();return;}
+  S.answered=false; S.firstTry=true;
+  const c=COUNTRIES[S.currentCountryIdx];
+  const q=S.currentQSet[S.qIdx];
+  // Update attempt badge
+  const attBadge=document.getElementById('g-attempt-badge');
+  if(attBadge&&S.attemptsByCountry[c.id]){
+    const attN=S.attemptsByCountry[c.id].count;
+    if(attN>1){
+      attBadge.style.display='inline-flex';
+      attBadge.textContent = attN<=3 ? '🎲 Set '+attN+'/3' : '🔀 Remix #'+(attN-3);
+    } else { attBadge.style.display='none'; }
+  }
+  const cmap={geo:'tag-geo',hist:'tag-hist',soc:'tag-soc',mon:'tag-mon',nat:'tag-nat'};
+  const cname={geo:'Géographie',hist:'Histoire',soc:'Société',mon:'Monuments',nat:'Nature'};
+  document.getElementById('g-flag').textContent=c.flag;
+  document.getElementById('g-country').textContent=c.name;
+  document.getElementById('g-tag').className='tag '+cmap[q.c];
+  document.getElementById('g-tag').textContent=cname[q.c];
+  document.getElementById('g-qnum').textContent=(S.qIdx+1)+' / 12';
+  document.getElementById('g-qtext').textContent=q.q;
+  document.getElementById('g-hint').textContent='💡 Indice : '+q.h;
+  document.getElementById('g-fb').style.display='none';
+  document.getElementById('g-next').style.display='none';
+  document.getElementById('g-score').textContent=Math.round(S.countryResults[c.id].score)+' pts';
+  document.getElementById('q-prog-fill').style.width=Math.round(S.qIdx/12*100)+'%';
+  updateLives(); updateStreak();
+  const grid=document.getElementById('g-choices');
+  grid.innerHTML=q.ch.map((ch,i)=>`<button class="choice" onclick="answer(${i})">${ch}</button>`).join('');
+  startTimer();
+}
+
+function updateLives(){
+  document.getElementById('lives-hud').innerHTML=Array.from({length:5},(_,i)=>`<span class="lv">${i<S.lives?'❤️':'🖤'}</span>`).join('');
+}
+function updateStreak(){
+  const el=document.getElementById('streak-hud');
+  if(S.streak>=3){el.style.display='inline-flex';el.className='streak-badge';el.textContent='🔥 Série ×'+S.streak;}
+  else el.style.display='none';
+}
+
+function startTimer(){
+  clearInterval(S.timerInt); S.timerVal=25;
+  const el=document.getElementById('g-timer');
+  el.textContent='25'; el.className='hud-timer';
+  S.timerInt=setInterval(()=>{
+    S.timerVal--;
+    el.textContent=S.timerVal;
+    if(S.timerVal<=5) el.className='hud-timer urgent';
+    if(S.timerVal<=0){clearInterval(S.timerInt);timeUp();}
+  },1000);
+}
+
+function timeUp(){
+  if(S.answered) return;
+  S.answered=true; S.lives--;
+  const q=S.currentQSet[S.qIdx];
+  document.querySelectorAll('.choice').forEach((b,i)=>{b.disabled=true;if(i===q.a)b.classList.add('reveal');});
+  const res=S.countryResults[COUNTRIES[S.currentCountryIdx].id];
+  res.details.push({q:q.q,correct:false,pts:0,cat:q.c});
+  showFB(false,'⏱ Temps écoulé ! Bonne réponse : '+q.ch[q.a],q.info);
+  S.streak=0; updateStreak(); updateLives();
+  if(S.lives<=0){clearInterval(S.timerInt);setTimeout(gameOver,1800);return;}
+  document.getElementById('g-next').style.display='block';
+  S.qIdx++;
+}
+
+function answer(i){
+  if(S.answered) return;
+  clearInterval(S.timerInt);
+  const c=COUNTRIES[S.currentCountryIdx];
+  const q=S.currentQSet[S.qIdx];
+  const btns=document.querySelectorAll('.choice');
+  btns.forEach(b=>b.disabled=true);
+  const res=S.countryResults[c.id];
+  if(i===q.a){
+    btns[i].classList.add('correct');
+    let pts=S.firstTry?15:8, bonus=0;
+    if(S.firstTry&&S.timerVal>=20) bonus+=5;
+    if(S.streak>=3&&S.firstTry) bonus+=10;
+    res.score+=pts+bonus; S.streak++; S.answered=true;
+    res.details.push({q:q.q,correct:true,pts:pts+bonus,cat:q.c,firstTry:S.firstTry});
+    showFB(true,'✅ Bonne réponse ! +'+pts+' pts'+(bonus>0?' +'+bonus+' bonus !':''),q.info,bonus>0);
+    updateStreak(); document.getElementById('g-score').textContent=Math.round(res.score)+' pts';
+    document.getElementById('g-next').style.display='block'; S.qIdx++;
+  } else {
+    btns[i].classList.add('wrong');
+    if(S.firstTry){
+      S.firstTry=false; S.lives--; S.streak=0;
+      showFB(false,'❌ Mauvaise réponse ! −1 vie. Essaie encore…',null);
+      updateLives(); updateStreak();
+      if(S.lives<=0){res.details.push({q:q.q,correct:false,pts:0,cat:q.c});clearInterval(S.timerInt);setTimeout(gameOver,1800);return;}
+      setTimeout(()=>{
+        document.querySelectorAll('.choice').forEach(b=>{b.disabled=false;b.classList.remove('wrong');});
+        document.getElementById('g-fb').style.display='none';
+        startTimer(); S.answered=false;
+      },1500);
+    } else {
+      btns[q.a].classList.add('reveal'); S.answered=true; S.lives--;
+      updateLives(); S.streak=0; updateStreak();
+      res.details.push({q:q.q,correct:false,pts:0,cat:q.c});
+      showFB(false,'❌ Raté ! Réponse : '+q.ch[q.a],q.info);
+      if(S.lives<=0){clearInterval(S.timerInt);setTimeout(gameOver,1800);return;}
+      document.getElementById('g-next').style.display='block'; S.qIdx++;
+    }
+  }
+}
+
+function showFB(ok,msg,info,bonus){
+  const el=document.getElementById('g-fb'); el.style.display='block';
+  let h=`<div class="fb ${ok?'fb-ok':'fb-ko'}">${msg}</div>`;
+  if(info) h+=`<div class="fb fb-info">💡 ${info}</div>`;
+  el.innerHTML=h;
+}
+
+function nextQ(){ loadQ(); }
+
+function gameOver(){
+  const c=COUNTRIES[S.currentCountryIdx];
+  const res=S.countryResults[c.id];
+  const att = S.attemptsByCountry[c.id];
+  const attCount = att ? att.count : 1;
+  let retryMsg = '';
+  if (attCount === 1) retryMsg = 'Essai 1/3 — un nouveau set de questions t\'attend !';
+  else if (attCount === 2) retryMsg = 'Essai 2/3 — encore un nouveau set de questions !';
+  else if (attCount === 3) retryMsg = 'Essai 3/3 — dernier set inédit, accroche-toi !';
+  else retryMsg = 'Essai '+attCount+' — les questions des 3 premiers essais sont remixées !';
+  document.getElementById('go-msg').innerHTML =
+    'Tu as perdu toutes tes vies sur <strong>'+c.name+'</strong> avec <strong>'+Math.round(res.score)+'</strong> pts.<br><br>' +
+    '<span style="color:var(--gold);font-size:13px">🎲 '+retryMsg+'</span>';
+  saveProgress(); // save even on fail so partial progress is kept
+  showScreen('game-over');
+}
+
+function endCountry(){
+  clearInterval(S.timerInt);
+  const c=COUNTRIES[S.currentCountryIdx];
+  const res=S.countryResults[c.id];
+  res.done=true;
+  S.totalScore=Object.values(S.countryResults).reduce((s,r)=>s+(r.score||0),0);
+  saveProgress();
+  const pct=Math.round(res.score/MAX_PER_COUNTRY*100);
+  const medal=pct>=85?'🏆':pct>=65?'🥇':pct>=45?'🥈':'🥉';
+  const msg=pct>=85?'Mission accomplie avec excellence ! Tu connais ce pays sur le bout des doigts.':
+    pct>=65?'Très bien joué ! Tu as montré de vraies connaissances culturelles.':
+    pct>=45?'Bon travail ! Quelques points à revoir mais tu progresses bien.':
+    'Mission accomplie ! Tu peux rejouer pour améliorer ton score.';
+  const correct=res.details.filter(d=>d.correct).length;
+  document.getElementById('ce-medal').textContent=medal;
+  document.getElementById('ce-score').textContent=Math.round(res.score)+' pts';
+  document.getElementById('ce-sub').textContent='sur '+MAX_PER_COUNTRY+' possibles ('+pct+'%)';
+  document.getElementById('ce-stats').innerHTML=`
+    <div class="stat-box"><div class="stat-val">${correct}</div><div class="stat-lbl">Bonnes réponses</div></div>
+    <div class="stat-box"><div class="stat-val">${12-correct}</div><div class="stat-lbl">Erreurs</div></div>
+    <div class="stat-box"><div class="stat-val">${pct}%</div><div class="stat-lbl">Réussite</div></div>`;
+  document.getElementById('ce-msg').textContent=msg;
+  showScreen('country-end');
+}
+
+function showFinalScreen(){
+  clearInterval(S.timerInt);
+  const pct=Math.round(S.totalScore/TOTAL_MAX*100);
+  const medal=pct>=80?'🏆':pct>=60?'🥇':pct>=40?'🥈':'🥉';
+  const msg=pct>=80?'Extraordinaire ! Tu es un véritable ambassadeur du Commonwealth. Tes connaissances sont impressionnantes !':
+    pct>=60?'Excellent voyage ! Tu as traversé 5 pays avec brio. Tu mérites le titre d\'Explorateur Culturel Confirmé !':
+    pct>=40?'Belle aventure ! Certains pays méritent une deuxième visite pour améliorer ton score.':
+    'Aventure complétée ! Tu as eu le courage de traverser les 5 pays. Reviens renforcer tes connaissances !';
+  document.getElementById('fin-medal').textContent=medal;
+  document.getElementById('fin-score').textContent=Math.round(S.totalScore);
+  const totalCorrect=Object.values(S.countryResults).reduce((s,r)=>s+(r.details?.filter(d=>d.correct).length||0),0);
+  document.getElementById('fin-stats').innerHTML=`
+    <div class="stat-box"><div class="stat-val">${totalCorrect}</div><div class="stat-lbl">Bonnes réponses</div></div>
+    <div class="stat-box"><div class="stat-val">${60-totalCorrect}</div><div class="stat-lbl">Erreurs</div></div>
+    <div class="stat-box"><div class="stat-val">${pct}%</div><div class="stat-lbl">Score global</div></div>`;
+  document.getElementById('fin-msg').textContent=msg;
+  let recap='<div class="section-title">Résultats par pays :</div>';
+  COUNTRIES.forEach(c=>{
+    const r=S.countryResults[c.id];
+    if(!r) return;
+    const p=Math.round((r.score||0)/MAX_PER_COUNTRY*100);
+    const corr=r.details?.filter(d=>d.correct).length||0;
+    recap+=`<div class="cp-row"><span class="cp-flag">${c.flag}</span><span class="cp-name">${c.name}</span><div class="cp-bar-wrap"><div class="cp-bar" style="width:${p}%;background:var(--green)"></div></div><span class="cp-pts">${Math.round(r.score)} pts (${corr}/12)</span></div>`;
+  });
+  document.getElementById('fin-recap').innerHTML=recap;
+  showScreen('final');
+}
+
+function resetAll(){
+  S={...S,studentName:'',studentClass:'',currentCountryIdx:null,countryResults:{},totalScore:0,attemptsByCountry:{},currentQSet:[]};
+  const fab=document.getElementById('pdf-fab');
+  if(fab) fab.style.display='none';
+  showScreen('home');
+}
+
+// ===================== STUDENT PROGRESS =====================
+function showStudentProgress() {
+  renderProgressContent();
+  showScreen('student-progress');
+}
+
+function renderProgressContent() {
+  const el = document.getElementById('progress-content');
+  if (!el) return;
+
+  const allD = Object.values(S.countryResults||{}).flatMap(r=>r.details||[]);
+  const totalCorrect = allD.filter(d=>d.correct).length;
+  const totalQ = allD.length;
+  const totalPct = totalQ > 0 ? Math.round(totalCorrect/totalQ*100) : 0;
+  const doneCountries = Object.values(S.countryResults||{}).filter(r=>r.done).length;
+
+  let h = '';
+
+  // Header identity
+  h += `<div style="background:linear-gradient(160deg,rgba(40,26,8,0.9),rgba(25,15,4,0.95));border:1px solid rgba(200,150,30,0.25);border-radius:var(--r);padding:12px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:12px">
+    <div style="font-size:28px">🧭</div>
+    <div>
+      <div style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);letter-spacing:2px">${S.studentName}</div>
+      <div style="font-family:'Special Elite',monospace;font-size:11px;color:var(--text3);margin-top:2px">Classe : ${S.studentClass} · ${doneCountries}/5 pays explorés</div>
+    </div>
+    <div style="margin-left:auto;text-align:right">
+      <div style="font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:var(--gold)">${Math.round(S.totalScore||0)}</div>
+      <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3)">/ 900 pts</div>
+    </div>
+  </div>`;
+
+  // Global stats
+  h += `<div class="stat-grid" style="margin-bottom:1rem">
+    <div class="stat-box"><div class="stat-val">${Math.round(S.totalScore||0)}</div><div class="stat-lbl">Points totaux</div></div>
+    <div class="stat-box"><div class="stat-val">${totalCorrect}/${totalQ}</div><div class="stat-lbl">Bonnes réponses</div></div>
+    <div class="stat-box"><div class="stat-val">${totalPct}%</div><div class="stat-lbl">Réussite</div></div>
+  </div>`;
+
+  // Country-by-country table
+  h += `<div class="section-title" style="margin-bottom:8px">Tableau des scores par pays</div>`;
+  h += `<div style="border:1px solid rgba(160,110,30,0.2);border-radius:var(--r);overflow:hidden;margin-bottom:1rem">`;
+
+  // Table header
+  h += `<div style="display:grid;grid-template-columns:28px 1fr 60px 60px 70px;gap:0;background:rgba(40,26,8,0.95);padding:7px 10px;border-bottom:1px solid rgba(160,110,30,0.2)">
+    <div></div>
+    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);letter-spacing:0.04em">PAYS</div>
+    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);text-align:center">RÉPONSES</div>
+    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);text-align:center">TAUX</div>
+    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);text-align:right">POINTS</div>
+  </div>`;
+
+  COUNTRIES.forEach((c,i) => {
+    const r = S.countryResults?.[c.id];
+    const pts = r?.score || 0;
+    const done = r?.done || false;
+    const corr = r?.details?.filter(d=>d.correct).length || 0;
+    const tot  = r?.details?.length || 0;
+    const pct  = tot > 0 ? Math.round(corr/tot*100) : 0;
+    const pctColor = pct>=70 ? '#9fdcaa' : pct>=40 ? 'var(--amber)' : '#d4908a';
+    const statusIcon = done ? '✓' : tot > 0 ? '…' : '—';
+    const statusColor = done ? 'var(--green)' : tot > 0 ? 'var(--amber)' : 'var(--text3)';
+    const bg = i%2===0 ? 'rgba(25,15,5,0.6)' : 'rgba(18,10,3,0.6)';
+
+    h += `<div style="display:grid;grid-template-columns:28px 1fr 60px 60px 70px;gap:0;background:${bg};padding:8px 10px;border-bottom:1px solid rgba(160,110,30,0.08);align-items:center">
+      <div style="font-size:16px">${c.flag}</div>
+      <div>
+        <div style="font-family:'Crimson Text',serif;font-size:14px;color:var(--text)">${c.name}</div>
+        <div style="font-size:9px;color:${statusColor};font-family:'Special Elite',monospace;margin-top:1px">${statusIcon}${done?' Terminé':tot>0?' En cours':' Non commencé'}</div>
+      </div>
+      <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--text2)">${done?corr+'/12':'—'}</div>
+      <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:${done?pctColor:'var(--text3)'}">${done?pct+'%':'—'}</div>
+      <div style="text-align:right;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:${done?'var(--gold)':'var(--text3)'}">${done?Math.round(pts)+' pts':'—'}</div>
+    </div>`;
+  });
+
+  // Total row
+  const maxSoFar = Object.values(S.countryResults||{}).filter(r=>r.done).length * MAX_PER_COUNTRY;
+  h += `<div style="display:grid;grid-template-columns:28px 1fr 60px 60px 70px;gap:0;background:rgba(50,32,8,0.95);padding:8px 10px;border-top:1px solid rgba(200,150,40,0.25);align-items:center">
+    <div></div>
+    <div style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold);letter-spacing:0.04em">TOTAL</div>
+    <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--text2)">${totalCorrect}/${totalQ}</div>
+    <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:${totalPct>=70?'#9fdcaa':totalPct>=40?'var(--amber)':'#d4908a'}">${totalQ>0?totalPct+'%':'—'}</div>
+    <div style="text-align:right;font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:var(--gold)">${Math.round(S.totalScore||0)} pts</div>
+  </div>`;
+
+  h += `</div>`;
+
+  // Progress bars
+  h += `<div class="section-title" style="margin-bottom:8px">Progression visuelle</div>`;
+  const globalPct = Math.round((S.totalScore||0)/TOTAL_MAX*100);
+  h += `<div style="margin-bottom:1rem">
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+      <span style="font-family:'Special Elite',monospace;font-size:11px;color:var(--text3)">Score global</span>
+      <span style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold)">${globalPct}%</span>
+    </div>
+    <div class="prog-wrap" style="height:10px"><div class="prog-fill" style="width:${globalPct}%"></div></div>
+  </div>`;
+
+  COUNTRIES.forEach(c => {
+    const r = S.countryResults?.[c.id];
+    if (!r || !r.done) return;
+    const p = Math.round((r.score||0)/MAX_PER_COUNTRY*100);
+    h += `<div style="margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+        <span style="font-size:13px;font-family:'Crimson Text',serif;color:var(--text2)">${c.flag} ${c.name}</span>
+        <span style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold)">${Math.round(r.score)} pts</span>
+      </div>
+      <div class="prog-wrap"><div class="prog-fill" style="width:${p}%"></div></div>
+    </div>`;
+  });
+
+  el.innerHTML = h;
+}
+
+// ── PDF Export ──────────────────────────────────────────────────────────
+function exportProgressPDF() {
+  const allD = Object.values(S.countryResults||{}).flatMap(r=>r.details||[]);
+  const totalCorrect = allD.filter(d=>d.correct).length;
+  const totalQ = allD.length;
+  const totalPct = totalQ > 0 ? Math.round(totalCorrect/totalQ*100) : 0;
+  const doneCountries = Object.values(S.countryResults||{}).filter(r=>r.done).length;
+  const date = new Date().toLocaleDateString('fr-FR');
+
+  // Build detailed answer rows per country
+  let detailSections = '';
+  COUNTRIES.forEach(c => {
+    const r = S.countryResults?.[c.id];
+    if(!r || !r.details || r.details.length === 0) return;
+    let qRows = '';
+    r.details.forEach((d,i) => {
+      const icon = d.correct ? '✓' : '✗';
+      const color = d.correct ? '#2d6a3a' : '#8a2a1a';
+      qRows += `<tr>
+        <td style="color:#666;text-align:center">${i+1}</td>
+        <td>${d.q||'—'}</td>
+        <td style="text-align:center;color:${color};font-weight:700">${icon}</td>
+        <td style="text-align:center;color:${d.correct?'#2d6a3a':'#666'}">${d.pts > 0 ? '+'+d.pts+' pts' : '0'}</td>
+      </tr>`;
+    });
+    const corr = r.details.filter(d=>d.correct).length;
+    detailSections += `
+      <h3 style="font-size:14px;color:#5a3a08;margin:18px 0 6px;border-bottom:1px solid #ddd;padding-bottom:4px">${c.flag} ${c.name} — ${Math.round(r.score||0)} pts (${corr}/12)</h3>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:8px;font-size:12px">
+        <thead><tr style="background:#e8d8a0">
+          <th style="padding:5px;width:30px">#</th>
+          <th style="padding:5px;text-align:left">Question</th>
+          <th style="padding:5px;width:40px">Rép.</th>
+          <th style="padding:5px;width:60px">Points</th>
+        </tr></thead>
+        <tbody>${qRows}</tbody>
+      </table>`;
+  });
+
+  let rows = '';
+  COUNTRIES.forEach(c => {
+    const r = S.countryResults?.[c.id];
+    const pts = r?.score || 0;
+    const done = r?.done || false;
+    const corr = r?.details?.filter(d=>d.correct).length || 0;
+    const tot  = r?.details?.length || 0;
+    const pct  = tot > 0 ? Math.round(corr/tot*100) : 0;
+    rows += `<tr>
+      <td>${c.flag} ${c.name}</td>
+      <td style="text-align:center">${done ? corr+' / 12' : '—'}</td>
+      <td style="text-align:center">${done ? pct+'%' : '—'}</td>
+      <td style="text-align:center;color:${done?'#7a5a10':'#999'};font-weight:${done?'700':'400'}">${done ? Math.round(pts)+' pts' : '—'}</td>
+      <td style="text-align:center">${done ? '✓ Terminé' : tot>0 ? '… En cours' : 'Non commencé'}</td>
+    </tr>`;
+  });
+
+  const medal = totalPct>=80?'🏆':totalPct>=60?'🥇':totalPct>=40?'🥈':'🥉';
+
+  const pdfHTML = `<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8">
+<title>Commonwealth Explorer — Résultats ${S.studentName}</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Georgia, serif; color: #2a1a04; background: #fdf6e3; padding: 32px; }
+  .header { text-align: center; border-bottom: 3px double #8a6010; padding-bottom: 18px; margin-bottom: 22px; }
+  .header h1 { font-size: 26px; letter-spacing: 3px; color: #5a3a08; text-transform: uppercase; }
+  .header .sub { font-size: 13px; color: #8a6010; margin-top: 6px; font-style: italic; }
+  .id-box { background: #f5e8c0; border: 1px solid #c9a830; border-radius: 8px; padding: 12px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+  .id-code { font-size: 22px; font-weight: 700; color: #7a5010; letter-spacing: 4px; }
+  .id-detail { font-size: 13px; color: #6a4808; }
+  .score-banner { background: linear-gradient(135deg, #f5e8c0, #ffe9a0); border: 2px solid #c9a830; border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 22px; }
+  .score-banner .big { font-size: 42px; font-weight: 700; color: #5a3a08; }
+  .score-banner .label { font-size: 13px; color: #8a6010; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 22px; }
+  thead tr { background: #5a3a08; color: #fdf6e3; }
+  thead th { padding: 10px 14px; font-size: 12px; letter-spacing: 0.05em; text-align: left; }
+  tbody tr:nth-child(even) { background: #f5e8c0; }
+  tbody tr:nth-child(odd)  { background: #fdf6e3; }
+  tbody td { padding: 9px 14px; font-size: 13px; border-bottom: 1px solid #ddd; }
+  tfoot tr { background: #f0d890; font-weight: 700; }
+  tfoot td { padding: 10px 14px; font-size: 13px; border-top: 2px solid #c9a830; }
+  .note { font-size: 11px; color: #8a6010; font-style: italic; text-align: center; margin-top: 10px; }
+  .footer { text-align: center; font-size: 11px; color: #aaa; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 12px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🌍 Commonwealth Explorer</h1>
+  <div class="sub">Résultats d'exploration — généré le ${date}</div>
+</div>
+<div class="id-box">
+  <div>
+    <div class="id-code">${S.studentName}</div>
+    <div class="id-detail">Classe : ${S.studentClass}</div>
+  </div>
+  <div style="text-align:right">
+    <div style="font-size:18px">${medal}</div>
+    <div class="id-detail">${doneCountries}/5 pays explorés</div>
+  </div>
+</div>
+<div class="score-banner">
+  <div class="big">${Math.round(S.totalScore||0)} pts</div>
+  <div class="label">sur 900 possibles · ${totalPct}% de réussite · ${totalCorrect}/${totalQ} bonnes réponses</div>
+</div>
+<table>
+  <thead><tr>
+    <th>Pays</th>
+    <th style="text-align:center">Réponses</th>
+    <th style="text-align:center">Taux</th>
+    <th style="text-align:center">Points</th>
+    <th style="text-align:center">Statut</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+  <tfoot><tr>
+    <td>TOTAL</td>
+    <td style="text-align:center">${totalCorrect} / ${totalQ}</td>
+    <td style="text-align:center">${totalQ>0?totalPct+'%':'—'}</td>
+    <td style="text-align:center;color:#5a3a08">${Math.round(S.totalScore||0)} pts</td>
+    <td style="text-align:center">${doneCountries}/5 pays</td>
+  </tr></tfoot>
+</table>
+<div class="note">Document généré depuis Commonwealth Explorer · À remettre au professeur</div>
+<div class="footer">Commonwealth Explorer — Application pédagogique · Données anonymisées</div>
+</body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(pdfHTML);
+  win.document.close();
+  // Inject detail sections
+  if(detailSections) {
+    const ph = win.document.getElementById('pdf-detail-placeholder');
+    if(ph) {
+      const h2 = win.document.createElement('h2');
+      h2.style.cssText='font-size:16px;color:#5a3a08;margin:24px 0 10px;border-bottom:2px solid #c9a830;padding-bottom:6px';
+      h2.textContent='Détail des réponses par pays';
+      ph.parentNode.insertBefore(h2, ph);
+      ph.outerHTML = detailSections;
+    }
+  }
+  setTimeout(() => { win.focus(); win.print(); }, 700);
+}
+
+// ===================== SAVE =====================
+function saveProgress(){
+  if(!S.studentName) return;
+  const key='cw_'+S.studentClass+'_'+S.studentName;
+  const d={
+    name:S.studentName,
+    classe:S.studentClass,
+    totalScore:Math.round(S.totalScore),
+    countryResults:S.countryResults,
+    attemptsByCountry:S.attemptsByCountry,
+    savedAt:new Date().toISOString()
+  };
+  try{localStorage.setItem(key,JSON.stringify(d));}catch(e){}
+}
+
+function loadSavedGame(code, classe){
+  const key='cw_'+classe+'_'+code;
+  try{
+    const raw=localStorage.getItem(key);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+
+function deleteSavedGame(code, classe){
+  const key='cw_'+classe+'_'+code;
+  try{ localStorage.removeItem(key); }catch(e){}
+}
+
+// ===================== PROF =====================
+let profData=[], selectedStudent=null, profTab='class';
+
+function showProf(){
+  showScreen('prof');
+  loadSessionCodeDisplay();
+  refreshProf();
+}
+window.showProf = showProf;
+
+function refreshProf(){
+  profData=[];
+  try{
+    Object.keys(localStorage).filter(k=>k.startsWith('cw_')).forEach(k=>{
+      try{profData.push(JSON.parse(localStorage.getItem(k)));}catch(e){}
+    });
+  }catch(e){}
+  if(profData.length===0){
+    profData=[
+      {name:'AL-MA',classe:'2PRO-A',totalScore:512,countryResults:{
+        uk:{score:142,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<10,pts:i<10?14:0,cat:'geo'}))},
+        au:{score:98,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<7,pts:i<7?14:0,cat:'hist'}))},
+        ca:{score:130,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<9,pts:i<9?14:0,cat:'soc'}))},
+        in:{score:142,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<10,pts:i<10?14:0,cat:'mon'}))},
+        nz:{score:0,done:false,details:[]}}},
+      {name:'TH-RO',classe:'2PRO-A',totalScore:284,countryResults:{
+        uk:{score:118,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<8,pts:i<8?14:0,cat:'geo'}))},
+        au:{score:166,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<11,pts:i<11?15:0,cat:'nat'}))},
+        ca:{score:0,done:false,details:[]},in:{score:0,done:false,details:[]},nz:{score:0,done:false,details:[]}}},
+      {name:'LE-DU',classe:'2PRO-B',totalScore:167,countryResults:{
+        uk:{score:167,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<11,pts:i<11?15:0,cat:'hist'}))},
+        au:{score:0,done:false,details:[]},ca:{score:0,done:false,details:[]},in:{score:0,done:false,details:[]},nz:{score:0,done:false,details:[]}}}
+    ];
+  }
+  switchTab('class');
+}
+
+function switchTab(t){
+  profTab=t;
+  // No tabs visible — show both views stacked
+  renderClass();
+  renderStats();
+}
+
+function renderClass(){
+  const el=document.getElementById('prof-class-view');
+  if(!profData.length){el.innerHTML='<div class="empty-state">Aucun élève enregistré.<br>Les scores apparaîtront après les premières parties sur cet appareil.</div>';return;}
+  let h='<div class="card">';
+  profData.sort((a,b)=>b.totalScore-a.totalScore).forEach((s,rank)=>{
+    const pct=Math.round((s.totalScore||0)/TOTAL_MAX*100);
+    const done=Object.values(s.countryResults||{}).filter(r=>r.done).length;
+    const code=s.name||'??';
+    const initials=code.replace('-','').slice(0,2);
+    const classeLabel=s.classe||'—';
+    const safeId = s.name.replace(/[^a-zA-Z0-9-]/g,'_');
+    h+=`<div class="student-row" id="row-${safeId}">
+      <div class="student-row-main" onclick="selectStudent('${s.name}')">
+        <span class="rank-badge">${rank+1}</span>
+        <div class="avatar">${initials}</div>
+        <div class="stu-prog">
+          <div class="stu-name" style="font-family:'Cinzel',serif;letter-spacing:1px">${code} <span style="font-size:11px;color:var(--text3);font-weight:400;font-family:'Crimson Text',serif">· ${classeLabel}</span></div>
+          <div class="stu-sub">${done}/5 pays · ${pct}% de réussite</div>
+          <div class="mini-prog"><div class="mini-fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="stu-score">${Math.round(s.totalScore||0)}</div>
+      </div>
+      <button class="btn-delete" onclick="deleteStudent('${s.name}', event)" title="Supprimer cet élève">🗑</button>
+    </div>`;
+  });
+  h+='</div><p class="note">Cliquer sur un élève pour voir le détail.<br>Les données sont sauvegardées dans le navigateur de cet appareil.</p>';
+  el.innerHTML=h;
+}
+
+function selectStudent(name){
+  selectedStudent=profData.find(s=>s.name===name);
+  // detail tab removed — no navigation needed
+}
+
+function deleteStudent(name, event) {
+  if (event) event.stopPropagation();
+  // Show inline confirm in the row
+  const rowId = 'row-' + CSS.escape(name);
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  const isDemoData = !Object.keys(localStorage).some(k => k.startsWith('cw_') && k !== 'cw_session_code');
+  if (isDemoData) {
+    // Demo mode: just remove from profData array
+    profData = profData.filter(s => s.name !== name);
+    if (selectedStudent && selectedStudent.name === name) selectedStudent = null;
+    renderClass();
+  
+    return;
+  }
+  row.innerHTML = `
+    <div class="delete-confirm" style="width:100%">
+      <div class="delete-confirm-msg">⚠️ Supprimer <strong style="color:#ffaaaa;font-family:'Cinzel',serif">${name}</strong> définitivement ?</div>
+      <div class="delete-confirm-btns">
+        <button class="btn-confirm-yes" onclick="confirmDelete('${name}')">✓ Supprimer</button>
+        <button class="btn-confirm-no" onclick="renderClass()">✕ Annuler</button>
+      </div>
+    </div>`;
+}
+
+function confirmDelete(name) {
+  // Remove from localStorage
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('cw_') && k !== 'cw_session_code');
+    keys.forEach(k => {
+      try {
+        const d = JSON.parse(localStorage.getItem(k));
+        if (d && d.name === name) localStorage.removeItem(k);
+      } catch(e) {}
+    });
+  } catch(e) {}
+  // Remove from profData
+  profData = profData.filter(s => s.name !== name);
+  if (selectedStudent && selectedStudent.name === name) selectedStudent = null;
+  renderClass();
+  if(profTab==='stats') renderStats();
+}
+
+function deleteStudentFromDetail(name) {
+  const el = document.getElementById('detail-delete-confirm');
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+
+function renderStats(){
+  const el=document.getElementById('prof-stats-view');
+  if(!profData.length){el.innerHTML='<div class="empty-state">Aucune donnée disponible.</div>';return;}
+  const avg=Math.round(profData.reduce((s,p)=>s+(p.totalScore||0),0)/profData.length);
+  const allD=profData.flatMap(p=>Object.values(p.countryResults||{}).flatMap(r=>r.details||[]));
+  const gPct=allD.length?Math.round(allD.filter(d=>d.correct).length/allD.length*100):0;
+  const finished=profData.filter(p=>Object.values(p.countryResults||{}).filter(r=>r.done).length===5).length;
+  let h=`<div class="card">
+    <div class="stat-grid" style="margin-bottom:1rem">
+      <div class="stat-box"><div class="stat-val">${profData.length}</div><div class="stat-lbl">Élèves</div></div>
+      <div class="stat-box"><div class="stat-val">${avg}</div><div class="stat-lbl">Score moyen</div></div>
+      <div class="stat-box"><div class="stat-val">${gPct}%</div><div class="stat-lbl">Taux réussite</div></div>
+    </div>
+    <div class="section-title">Avancement de la classe :</div>`;
+  COUNTRIES.forEach(c=>{
+    const played=profData.filter(p=>p.countryResults?.[c.id]?.done).length;
+    const p=profData.length?Math.round(played/profData.length*100):0;
+    h+=`<div class="cp-row"><span class="cp-flag">${c.flag}</span><span class="cp-name">${c.name}</span>
+      <div class="cp-bar-wrap"><div class="cp-bar" style="width:${p}%;background:var(--green)"></div></div>
+      <span class="cp-pts">${played}/${profData.length} élèves</span></div>`;
+  });
+  const catMap={geo:'Géographie',hist:'Histoire',soc:'Société',mon:'Monuments',nat:'Nature'};
+  h+='<div class="section-title">Thèmes (taux de réussite classe) :</div>';
+  ['geo','hist','soc','mon','nat'].forEach(cat=>{
+    const cq=allD.filter(d=>d.cat===cat); if(!cq.length) return;
+    const p=Math.round(cq.filter(d=>d.correct).length/cq.length*100);
+    const color=p>=70?'var(--green)':p>=50?'var(--amber)':'var(--red)';
+    h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span style="font-size:13px;color:var(--text2);min-width:90px">${catMap[cat]}</span>
+      <div class="cp-bar-wrap" style="flex:1"><div class="cp-bar" style="width:${p}%;background:${color}"></div></div>
+      <span style="font-size:12px;color:var(--text2);min-width:35px">${p}%</span></div>`;
+  });
+  if(finished>0) h+=`<div class="fb fb-ok" style="margin-top:0.75rem;font-size:13px">🏆 ${finished} élève(s) ont terminé les 5 pays !</div>`;
+  h+='</div>';
+  el.innerHTML=h;
+}
+
+// Add twinkling stars to passport banner
+document.addEventListener('DOMContentLoaded', () => {
+  const banner = document.querySelector('.passport-anim');
+  if (!banner) return;
+  for (let i = 0; i < 18; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = (Math.random() * 2) + 's';
+    s.style.opacity = Math.random() * 0.5 + 0.1;
+    banner.appendChild(s);
+  }
+});
+</script>
+</body>
+</html>
