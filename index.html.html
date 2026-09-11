@@ -863,7 +863,7 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
 </head>
 <body>
 <div id="app">
-<button id="pdf-fab" onclick="renderProgressContent();exportProgressPDF()" title="Télécharger mes résultats en PDF">⬇ PDF résultats</button>
+<button id="pdf-fab" onclick="exportProgressPDF()" title="Télécharger mes résultats en PDF">⬇ PDF résultats</button>
 
 <!-- HOME -->
 <div id="screen-home" class="screen active">
@@ -917,18 +917,6 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
   <div style="display:flex;gap:8px;justify-content:center;margin-top:0.75rem;flex-wrap:wrap">
     <button class="btn-home-link" onclick="showScreen('rules')">📜 Règles du jeu</button>
     <button class="btn-home-link" onclick="showScreen('rgpd')">🔒 RGPD</button>
-  </div>
-</div>
-
-<!-- STUDENT PROGRESS -->
-<div id="screen-student-progress" class="screen">
-  <div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
-      <h2 style="font-family:'Cinzel',serif;font-size:17px;color:var(--gold);letter-spacing:0.04em">📊 Ma progression</h2>
-      <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0;font-family:'Special Elite',monospace;font-size:11px" onclick="exportProgressPDF()">⬇ Télécharger PDF</button>
-    </div>
-    <div id="progress-content"></div>
-    <button class="btn" style="margin-top:0.5rem" onclick="buildMap();showScreen('map')">← Retour à la carte</button>
   </div>
 </div>
 
@@ -988,8 +976,8 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
     </div>
 
     <div class="rules-section">
-      <div class="rules-section-title">🖥️ Aucune transmission externe</div>
-      <div class="rules-section-body">Aucune donnée n'est transmise à un serveur externe : toutes les informations (identifiant, réponses, score) restent uniquement dans la mémoire de votre navigateur, le temps de la partie en cours.</div>
+      <div class="rules-section-title">💾 Stockage local uniquement</div>
+      <div class="rules-section-body">Votre progression (score, réponses, pays explorés) est sauvegardée <strong>uniquement sur la tablette ou l'ordinateur que vous utilisez</strong>, dans la mémoire locale du navigateur. Aucune donnée ne quitte votre appareil.</div>
     </div>
 
     <div class="rules-section">
@@ -999,17 +987,12 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
 
     <div class="rules-section">
       <div class="rules-section-title">🪪 Données saisies</div>
-      <div class="rules-section-body">Les seules données saisies sont : les deux premières lettres de votre prénom et de votre nom — utilisées uniquement pour générer un identifiant au format <strong style="color:var(--gold);font-family:'Cinzel',serif">XX-YY</strong>, sans jamais collecter votre identité complète — ainsi que vos réponses aux exercices.</div>
-    </div>
-
-    <div class="rules-section">
-      <div class="rules-section-title">🗑️ Effacement automatique</div>
-      <div class="rules-section-body">Ces données ne sont jamais sauvegardées : elles disparaissent automatiquement si vous rechargez ou fermez la page. <strong>Pensez à télécharger votre PDF de résultats avant de quitter l'application.</strong></div>
+      <div class="rules-section-body">Les seules données saisies sont : les deux premières lettres de votre prénom et de votre nom — utilisées pour générer un identifiant au format <strong style="color:var(--gold);font-family:'Cinzel',serif">XX-YY</strong>, sans jamais collecter votre identité complète — ainsi que vos réponses aux exercices.</div>
     </div>
 
     <div class="rules-section">
       <div class="rules-section-title">📄 Le PDF de résultats</div>
-      <div class="rules-section-body">Le PDF généré est créé localement dans votre navigateur ; il n'est envoyé à personne automatiquement. C'est à vous de le transmettre à votre professeur.</div>
+      <div class="rules-section-body">Le PDF est généré localement dans votre navigateur et n'est envoyé à personne automatiquement. C'est à vous de le transmettre à votre professeur. <strong>Pensez à le télécharger avant de changer d'appareil.</strong></div>
     </div>
 
     <button class="btn" style="margin-top:0.5rem" onclick="showScreen('home')">← Retour à l'accueil</button>
@@ -1133,10 +1116,7 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
       <span class="prog-label" id="global-prog-label">0 / 60</span>
     </div>
   </div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:0.25rem">
-    <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0" onclick="renderProgressContent();showScreen('student-progress')">📊 Ma progression</button>
-    <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0" onclick="showScreen('home')">← Accueil</button>
-  </div>
+  <button class="btn btn-sm btn-inline" style="width:auto;margin-bottom:0" onclick="showScreen('home')">← Accueil</button>
 </div>
 
 <!-- COUNTRY INTRO -->
@@ -1228,19 +1208,19 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
 
 <!-- PROF -->
 <div id="screen-prof" class="screen">
-  <div class="dash-title"><span class="dash-icon">📊</span>Tableau de bord professeur</div>
+  <div class="dash-title"><span class="dash-icon">🗺️</span>Espace Professeur</div>
+
+  <!-- Code accès -->
   <div class="session-code-box">
-    <div class="session-code-label">🗝️ Code de session élèves — à afficher au tableau</div>
-    <div class="session-code-value" id="session-code-display">1234</div>
-    <div class="session-code-hint">Les élèves saisissent ce code pour accéder au jeu</div>
+    <div class="session-code-label">🗝️ Code d'accès élèves — à afficher au tableau</div>
+    <div class="session-code-value" id="session-code-display">Commonwealth2627</div>
+    <div class="session-code-hint">Les élèves saisissent ce code pour rejoindre l'aventure</div>
     <div id="session-edit-area" style="display:none;margin-top:12px">
       <div style="display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap">
         <input type="text" id="session-code-input"
-          placeholder="Nouveau code"
-          maxlength="4"
-          
-          style="width:160px;text-align:center;font-size:22px;font-weight:700;
-                 letter-spacing:8px;font-family:'Cinzel',serif;
+          placeholder="Nouveau code…" maxlength="30"
+          style="width:200px;text-align:center;font-size:15px;
+                 letter-spacing:2px;font-family:'Special Elite',monospace;
                  padding:10px 12px;margin-bottom:0;
                  background:rgba(255,209,102,0.08);
                  border:1px solid rgba(255,209,102,0.35);
@@ -1252,13 +1232,16 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
       </div>
       <div id="session-code-error" style="display:none;font-size:12px;color:#ffaaaa;margin-top:8px;text-align:center"></div>
     </div>
-    <div id="session-edit-btn-area" style="display:none"></div>
+
   </div>
 
-  <div id="prof-class-view"></div>
-  <div style="height:1px;background:rgba(160,110,30,0.15);margin:0.25rem 0 0.75rem"></div>
-  <div id="prof-stats-view"></div>
-  <div style="margin-top:1rem">
+  <!-- Questions & réponses par pays -->
+  <div class="card">
+    <div style="font-family:'Special Elite',monospace;font-size:11px;color:var(--gold);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:12px">📋 Questions &amp; Réponses par pays</div>
+    <div id="prof-qa-content"></div>
+  </div>
+
+  <div style="margin-top:0.75rem">
     <button class="btn btn-sm btn-inline" onclick="showScreen('home')">← Accueil</button>
   </div>
 </div>
@@ -1540,7 +1523,7 @@ function showScreen(id){
   if(el) el.classList.add('active');
   window.scrollTo(0,0);
   // Show/hide PDF FAB
-  const fabScreens = ['map','game','country-end','country-intro','student-progress','final','saved-game'];
+  const fabScreens = ['map','game','country-end','country-intro','final','saved-game'];
   const fab = document.getElementById('pdf-fab');
   if(fab) fab.style.display = (S.studentName && fabScreens.includes(id)) ? 'block' : 'none';
 }
@@ -1653,19 +1636,21 @@ function doResetSaved(){
 }
 
 function buildMap(){
+  console.log('[CWE] buildMap called. countryResults:', JSON.stringify(S.countryResults));
   document.getElementById('map-name').textContent = S.studentName+' · '+S.studentClass;
   document.getElementById('map-score-pill').textContent = Math.round(S.totalScore)+' pts';
   const g = document.getElementById('world-grid'); g.innerHTML='';
   let doneQ=0;
   COUNTRIES.forEach((c,i)=>{
-    const r = S.countryResults[c.id];
-    const done = r?.done;
-    const locked = i>0 && !S.countryResults[COUNTRIES[i-1].id]?.done;
+    const r = S.countryResults[c.id] || {};
+    const done = r.done === true;
+    const prevDone = i===0 || (S.countryResults[COUNTRIES[i-1].id]||{}).done === true;
+    const locked = !prevDone;
     if(done) doneQ+=12;
     const div=document.createElement('div');
     div.className='country-card'+(done?' done':'')+(locked?' locked':'')+((!done&&!locked)?' current-active':'');
-    div.innerHTML=`<div class="cc-flag">${c.flag}</div><div class="cc-name">${c.name}</div><div class="cc-pts">${done?Math.round(r.score)+' pts':locked?'🔒':'▶ Jouer'}</div>`;
-    if(!locked) div.onclick=()=>openCountry(i);
+    div.innerHTML=`<div class="cc-flag">${c.flag}</div><div class="cc-name">${c.name}</div><div class="cc-pts">${done?Math.round(r.score||0)+' pts':locked?'🔒':'▶ Jouer'}</div>`;
+    if(!locked) div.onclick=(()=>{ const idx=i; return ()=>openCountry(idx); })();
     g.appendChild(div);
   });
   const pct=Math.round(doneQ/60*100);
@@ -1790,6 +1775,7 @@ function answer(i){
     res.details.push({q:q.q,correct:true,pts:pts+bonus,cat:q.c,firstTry:S.firstTry});
     showFB(true,'✅ Bonne réponse ! +'+pts+' pts'+(bonus>0?' +'+bonus+' bonus !':''),q.info,bonus>0);
     updateStreak(); document.getElementById('g-score').textContent=Math.round(res.score)+' pts';
+    saveProgress();
     document.getElementById('g-next').style.display='block'; S.qIdx++;
   } else {
     btns[i].classList.add('wrong');
@@ -1809,6 +1795,7 @@ function answer(i){
       res.details.push({q:q.q,correct:false,pts:0,cat:q.c});
       showFB(false,'❌ Raté ! Réponse : '+q.ch[q.a],q.info);
       if(S.lives<=0){clearInterval(S.timerInt);setTimeout(gameOver,1800);return;}
+      saveProgress();
       document.getElementById('g-next').style.display='block'; S.qIdx++;
     }
   }
@@ -1862,6 +1849,9 @@ function endCountry(){
     <div class="stat-box"><div class="stat-val">${12-correct}</div><div class="stat-lbl">Erreurs</div></div>
     <div class="stat-box"><div class="stat-val">${pct}%</div><div class="stat-lbl">Réussite</div></div>`;
   document.getElementById('ce-msg').textContent=msg;
+  // Double-check done flag is set before navigating away
+  S.countryResults[c.id].done = true;
+  saveProgress();
   showScreen('country-end');
 }
 
@@ -1900,120 +1890,6 @@ function resetAll(){
   showScreen('home');
 }
 
-// ===================== STUDENT PROGRESS =====================
-function showStudentProgress() {
-  renderProgressContent();
-  showScreen('student-progress');
-}
-
-function renderProgressContent() {
-  const el = document.getElementById('progress-content');
-  if (!el) return;
-
-  const allD = Object.values(S.countryResults||{}).flatMap(r=>r.details||[]);
-  const totalCorrect = allD.filter(d=>d.correct).length;
-  const totalQ = allD.length;
-  const totalPct = totalQ > 0 ? Math.round(totalCorrect/totalQ*100) : 0;
-  const doneCountries = Object.values(S.countryResults||{}).filter(r=>r.done).length;
-
-  let h = '';
-
-  // Header identity
-  h += `<div style="background:linear-gradient(160deg,rgba(40,26,8,0.9),rgba(25,15,4,0.95));border:1px solid rgba(200,150,30,0.25);border-radius:var(--r);padding:12px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:12px">
-    <div style="font-size:28px">🧭</div>
-    <div>
-      <div style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);letter-spacing:2px">${S.studentName}</div>
-      <div style="font-family:'Special Elite',monospace;font-size:11px;color:var(--text3);margin-top:2px">Classe : ${S.studentClass} · ${doneCountries}/5 pays explorés</div>
-    </div>
-    <div style="margin-left:auto;text-align:right">
-      <div style="font-family:'Cinzel',serif;font-size:24px;font-weight:700;color:var(--gold)">${Math.round(S.totalScore||0)}</div>
-      <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3)">/ 900 pts</div>
-    </div>
-  </div>`;
-
-  // Global stats
-  h += `<div class="stat-grid" style="margin-bottom:1rem">
-    <div class="stat-box"><div class="stat-val">${Math.round(S.totalScore||0)}</div><div class="stat-lbl">Points totaux</div></div>
-    <div class="stat-box"><div class="stat-val">${totalCorrect}/${totalQ}</div><div class="stat-lbl">Bonnes réponses</div></div>
-    <div class="stat-box"><div class="stat-val">${totalPct}%</div><div class="stat-lbl">Réussite</div></div>
-  </div>`;
-
-  // Country-by-country table
-  h += `<div class="section-title" style="margin-bottom:8px">Tableau des scores par pays</div>`;
-  h += `<div style="border:1px solid rgba(160,110,30,0.2);border-radius:var(--r);overflow:hidden;margin-bottom:1rem">`;
-
-  // Table header
-  h += `<div style="display:grid;grid-template-columns:28px 1fr 60px 60px 70px;gap:0;background:rgba(40,26,8,0.95);padding:7px 10px;border-bottom:1px solid rgba(160,110,30,0.2)">
-    <div></div>
-    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);letter-spacing:0.04em">PAYS</div>
-    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);text-align:center">RÉPONSES</div>
-    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);text-align:center">TAUX</div>
-    <div style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);text-align:right">POINTS</div>
-  </div>`;
-
-  COUNTRIES.forEach((c,i) => {
-    const r = S.countryResults?.[c.id];
-    const pts = r?.score || 0;
-    const done = r?.done || false;
-    const corr = r?.details?.filter(d=>d.correct).length || 0;
-    const tot  = r?.details?.length || 0;
-    const pct  = tot > 0 ? Math.round(corr/tot*100) : 0;
-    const pctColor = pct>=70 ? '#9fdcaa' : pct>=40 ? 'var(--amber)' : '#d4908a';
-    const statusIcon = done ? '✓' : tot > 0 ? '…' : '—';
-    const statusColor = done ? 'var(--green)' : tot > 0 ? 'var(--amber)' : 'var(--text3)';
-    const bg = i%2===0 ? 'rgba(25,15,5,0.6)' : 'rgba(18,10,3,0.6)';
-
-    h += `<div style="display:grid;grid-template-columns:28px 1fr 60px 60px 70px;gap:0;background:${bg};padding:8px 10px;border-bottom:1px solid rgba(160,110,30,0.08);align-items:center">
-      <div style="font-size:16px">${c.flag}</div>
-      <div>
-        <div style="font-family:'Crimson Text',serif;font-size:14px;color:var(--text)">${c.name}</div>
-        <div style="font-size:9px;color:${statusColor};font-family:'Special Elite',monospace;margin-top:1px">${statusIcon}${done?' Terminé':tot>0?' En cours':' Non commencé'}</div>
-      </div>
-      <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--text2)">${done?corr+'/12':'—'}</div>
-      <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:${done?pctColor:'var(--text3)'}">${done?pct+'%':'—'}</div>
-      <div style="text-align:right;font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:${done?'var(--gold)':'var(--text3)'}">${done?Math.round(pts)+' pts':'—'}</div>
-    </div>`;
-  });
-
-  // Total row
-  const maxSoFar = Object.values(S.countryResults||{}).filter(r=>r.done).length * MAX_PER_COUNTRY;
-  h += `<div style="display:grid;grid-template-columns:28px 1fr 60px 60px 70px;gap:0;background:rgba(50,32,8,0.95);padding:8px 10px;border-top:1px solid rgba(200,150,40,0.25);align-items:center">
-    <div></div>
-    <div style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold);letter-spacing:0.04em">TOTAL</div>
-    <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--text2)">${totalCorrect}/${totalQ}</div>
-    <div style="text-align:center;font-family:'Cinzel',serif;font-size:13px;color:${totalPct>=70?'#9fdcaa':totalPct>=40?'var(--amber)':'#d4908a'}">${totalQ>0?totalPct+'%':'—'}</div>
-    <div style="text-align:right;font-family:'Cinzel',serif;font-size:15px;font-weight:700;color:var(--gold)">${Math.round(S.totalScore||0)} pts</div>
-  </div>`;
-
-  h += `</div>`;
-
-  // Progress bars
-  h += `<div class="section-title" style="margin-bottom:8px">Progression visuelle</div>`;
-  const globalPct = Math.round((S.totalScore||0)/TOTAL_MAX*100);
-  h += `<div style="margin-bottom:1rem">
-    <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-      <span style="font-family:'Special Elite',monospace;font-size:11px;color:var(--text3)">Score global</span>
-      <span style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold)">${globalPct}%</span>
-    </div>
-    <div class="prog-wrap" style="height:10px"><div class="prog-fill" style="width:${globalPct}%"></div></div>
-  </div>`;
-
-  COUNTRIES.forEach(c => {
-    const r = S.countryResults?.[c.id];
-    if (!r || !r.done) return;
-    const p = Math.round((r.score||0)/MAX_PER_COUNTRY*100);
-    h += `<div style="margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-        <span style="font-size:13px;font-family:'Crimson Text',serif;color:var(--text2)">${c.flag} ${c.name}</span>
-        <span style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold)">${Math.round(r.score)} pts</span>
-      </div>
-      <div class="prog-wrap"><div class="prog-fill" style="width:${p}%"></div></div>
-    </div>`;
-  });
-
-  el.innerHTML = h;
-}
-
 // ── PDF Export ──────────────────────────────────────────────────────────
 function exportProgressPDF() {
   const allD = Object.values(S.countryResults||{}).flatMap(r=>r.details||[]);
@@ -2021,139 +1897,196 @@ function exportProgressPDF() {
   const totalQ = allD.length;
   const totalPct = totalQ > 0 ? Math.round(totalCorrect/totalQ*100) : 0;
   const doneCountries = Object.values(S.countryResults||{}).filter(r=>r.done).length;
-  const date = new Date().toLocaleDateString('fr-FR');
+  const date = new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const medal = totalPct>=80?'🏆':totalPct>=60?'🥇':totalPct>=40?'🥈':'🥉';
 
-  // Build detailed answer rows per country
-  let detailSections = '';
+  // ── Tableau récap pays ───────────────────────────────────────────
+  let summaryRows = '';
   COUNTRIES.forEach(c => {
-    const r = S.countryResults?.[c.id];
-    if(!r || !r.details || r.details.length === 0) return;
-    let qRows = '';
-    r.details.forEach((d,i) => {
-      const icon = d.correct ? '✓' : '✗';
-      const color = d.correct ? '#2d6a3a' : '#8a2a1a';
-      qRows += `<tr>
-        <td style="color:#666;text-align:center">${i+1}</td>
-        <td>${d.q||'—'}</td>
-        <td style="text-align:center;color:${color};font-weight:700">${icon}</td>
-        <td style="text-align:center;color:${d.correct?'#2d6a3a':'#666'}">${d.pts > 0 ? '+'+d.pts+' pts' : '0'}</td>
-      </tr>`;
-    });
-    const corr = r.details.filter(d=>d.correct).length;
-    detailSections += `
-      <h3 style="font-size:14px;color:#5a3a08;margin:18px 0 6px;border-bottom:1px solid #ddd;padding-bottom:4px">${c.flag} ${c.name} — ${Math.round(r.score||0)} pts (${corr}/12)</h3>
-      <table style="width:100%;border-collapse:collapse;margin-bottom:8px;font-size:12px">
-        <thead><tr style="background:#e8d8a0">
-          <th style="padding:5px;width:30px">#</th>
-          <th style="padding:5px;text-align:left">Question</th>
-          <th style="padding:5px;width:40px">Rép.</th>
-          <th style="padding:5px;width:60px">Points</th>
-        </tr></thead>
-        <tbody>${qRows}</tbody>
-      </table>`;
-  });
-
-  let rows = '';
-  COUNTRIES.forEach(c => {
-    const r = S.countryResults?.[c.id];
-    const pts = r?.score || 0;
-    const done = r?.done || false;
-    const corr = r?.details?.filter(d=>d.correct).length || 0;
-    const tot  = r?.details?.length || 0;
+    const r = S.countryResults?.[c.id] || {};
+    const pts  = r.score || 0;
+    const done = r.done === true;
+    const dets = r.details || [];
+    const corr = dets.filter(d=>d.correct).length;
+    const tot  = dets.length;
     const pct  = tot > 0 ? Math.round(corr/tot*100) : 0;
-    rows += `<tr>
+    const pctColor = pct>=70?'#2d6a3a':pct>=40?'#7a5010':'#8a2a1a';
+    summaryRows += `<tr>
       <td>${c.flag} ${c.name}</td>
-      <td style="text-align:center">${done ? corr+' / 12' : '—'}</td>
-      <td style="text-align:center">${done ? pct+'%' : '—'}</td>
-      <td style="text-align:center;color:${done?'#7a5a10':'#999'};font-weight:${done?'700':'400'}">${done ? Math.round(pts)+' pts' : '—'}</td>
-      <td style="text-align:center">${done ? '✓ Terminé' : tot>0 ? '… En cours' : 'Non commencé'}</td>
+      <td style="text-align:center">${tot>0 ? corr+' / '+tot : '—'}</td>
+      <td style="text-align:center;color:${pctColor};font-weight:600">${tot>0 ? pct+'%' : '—'}</td>
+      <td style="text-align:center;font-weight:700;color:${done?'#7a5a10':'#999'}">${done ? Math.round(pts)+' pts' : tot>0 ? Math.round(pts)+' pts*' : '—'}</td>
+      <td style="text-align:center">${done?'✓ Terminé':tot>0?'… En cours':'Non commencé'}</td>
     </tr>`;
   });
 
-  const medal = totalPct>=80?'🏆':totalPct>=60?'🥇':totalPct>=40?'🥈':'🥉';
+  // ── Sections détaillées par pays (réponses + corrections + score) ──
+  const catNames = {geo:'Géographie',hist:'Histoire',soc:'Société',mon:'Monuments',nat:'Nature'};
+  let detailHTML = '';
+  COUNTRIES.forEach(c => {
+    const r = S.countryResults?.[c.id] || {};
+    const dets = r.details || [];
+    if(dets.length === 0) return;
+    const corr = dets.filter(d=>d.correct).length;
+    const qData = ALL_Q[c.id] || [];
+
+    let qRows = '';
+    dets.forEach((d, i) => {
+      // Find the full question data to get the correct answer text
+      const qFull = qData.find(q => q.q === d.q) || {};
+      const correctAnswerText = qFull.ch ? qFull.ch[qFull.a] : '—';
+      const info = qFull.info || '';
+      const catLabel = catNames[d.cat] || d.cat || '';
+      const rowBg = i%2===0 ? '#fdf6e3' : '#f5e8c0';
+
+      qRows += `<tr style="background:${rowBg}">
+        <td style="text-align:center;color:#999;font-size:11px;padding:6px 8px;vertical-align:top">${i+1}</td>
+        <td style="padding:6px 8px;vertical-align:top">
+          <div style="font-size:12px;color:#2a1a04;margin-bottom:3px">${d.q||'—'}</div>
+          <div style="font-size:10px;color:#8a6010;font-style:italic">${catLabel}</div>
+        </td>
+        <td style="text-align:center;vertical-align:top;padding:6px 8px">
+          <span style="font-size:16px;font-weight:700;color:${d.correct?'#2d6a3a':'#8a2a1a'}">${d.correct?'✓':'✗'}</span>
+        </td>
+        <td style="padding:6px 8px;vertical-align:top">
+          <div style="font-size:11px;color:#2d6a3a;font-weight:600;margin-bottom:2px">✦ ${correctAnswerText}</div>
+          ${!d.correct && info ? '<div style="font-size:10px;color:#555;font-style:italic;line-height:1.4">'+info+'</div>' : ''}
+        </td>
+        <td style="text-align:center;vertical-align:top;padding:6px 8px;white-space:nowrap">
+          <span style="font-size:12px;font-weight:700;color:${d.correct?'#2d6a3a':'#8a2a1a'}">${d.correct ? (d.pts>0?'+'+d.pts+' pts':'+0') : '0'}</span>
+        </td>
+      </tr>`;
+    });
+
+    detailHTML += `
+    <div class="country-section">
+      <div class="country-header">
+        <span>${c.flag} ${c.name}</span>
+        <span>${corr} / ${dets.length} correctes — ${Math.round(r.score||0)} pts${r.done?' ✓':' (en cours)'}</span>
+      </div>
+      <table class="detail-table">
+        <thead><tr>
+          <th style="width:28px">#</th>
+          <th>Question</th>
+          <th style="width:36px">Rép.</th>
+          <th>Correction &amp; Explication</th>
+          <th style="width:55px">Score</th>
+        </tr></thead>
+        <tbody>${qRows}</tbody>
+      </table>
+    </div>`;
+  });
 
   const pdfHTML = `<!DOCTYPE html>
 <html lang="fr"><head><meta charset="UTF-8">
-<title>Commonwealth Explorer — Résultats ${S.studentName}</title>
+<title>Commonwealth Explorer — ${S.studentName} — ${S.studentClass}</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Georgia, serif; color: #2a1a04; background: #fdf6e3; padding: 32px; }
-  .header { text-align: center; border-bottom: 3px double #8a6010; padding-bottom: 18px; margin-bottom: 22px; }
-  .header h1 { font-size: 26px; letter-spacing: 3px; color: #5a3a08; text-transform: uppercase; }
-  .header .sub { font-size: 13px; color: #8a6010; margin-top: 6px; font-style: italic; }
-  .id-box { background: #f5e8c0; border: 1px solid #c9a830; border-radius: 8px; padding: 12px 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-  .id-code { font-size: 22px; font-weight: 700; color: #7a5010; letter-spacing: 4px; }
-  .id-detail { font-size: 13px; color: #6a4808; }
-  .score-banner { background: linear-gradient(135deg, #f5e8c0, #ffe9a0); border: 2px solid #c9a830; border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 22px; }
-  .score-banner .big { font-size: 42px; font-weight: 700; color: #5a3a08; }
-  .score-banner .label { font-size: 13px; color: #8a6010; margin-top: 4px; }
-  table { width: 100%; border-collapse: collapse; margin-bottom: 22px; }
-  thead tr { background: #5a3a08; color: #fdf6e3; }
-  thead th { padding: 10px 14px; font-size: 12px; letter-spacing: 0.05em; text-align: left; }
-  tbody tr:nth-child(even) { background: #f5e8c0; }
-  tbody tr:nth-child(odd)  { background: #fdf6e3; }
-  tbody td { padding: 9px 14px; font-size: 13px; border-bottom: 1px solid #ddd; }
-  tfoot tr { background: #f0d890; font-weight: 700; }
-  tfoot td { padding: 10px 14px; font-size: 13px; border-top: 2px solid #c9a830; }
-  .note { font-size: 11px; color: #8a6010; font-style: italic; text-align: center; margin-top: 10px; }
-  .footer { text-align: center; font-size: 11px; color: #aaa; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 12px; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:Georgia,serif; color:#2a1a04; background:#fdf6e3; padding:28px 32px; font-size:13px; }
+
+/* Header */
+.header { text-align:center; border-bottom:3px double #8a6010; padding-bottom:16px; margin-bottom:20px; }
+.header h1 { font-size:24px; letter-spacing:3px; color:#5a3a08; text-transform:uppercase; }
+.header .sub { font-size:12px; color:#8a6010; margin-top:5px; font-style:italic; }
+
+/* ID box */
+.id-box { background:#f5e8c0; border:1px solid #c9a830; border-radius:8px; padding:12px 18px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; }
+.id-code { font-size:20px; font-weight:700; color:#7a5010; letter-spacing:4px; }
+.id-detail { font-size:12px; color:#6a4808; margin-top:3px; }
+
+/* Score banner */
+.score-banner { background:linear-gradient(135deg,#f5e8c0,#ffe9a0); border:2px solid #c9a830; border-radius:10px; padding:14px 20px; text-align:center; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+.score-big { font-size:38px; font-weight:700; color:#5a3a08; }
+.score-detail { font-size:12px; color:#8a6010; text-align:left; line-height:1.7; }
+
+/* Summary table */
+.section-title { font-size:14px; font-weight:700; color:#5a3a08; margin:18px 0 8px; padding-bottom:4px; border-bottom:2px solid #c9a830; letter-spacing:0.05em; text-transform:uppercase; }
+table.summary { width:100%; border-collapse:collapse; margin-bottom:20px; }
+table.summary thead tr { background:#5a3a08; color:#fdf6e3; }
+table.summary thead th { padding:8px 12px; font-size:11px; letter-spacing:0.05em; text-align:left; }
+table.summary tbody tr:nth-child(even) { background:#f5e8c0; }
+table.summary tbody tr:nth-child(odd) { background:#fdf6e3; }
+table.summary tbody td { padding:8px 12px; font-size:12px; border-bottom:1px solid #e0cfa0; }
+table.summary tfoot tr { background:#f0d890; }
+table.summary tfoot td { padding:8px 12px; font-size:12px; font-weight:700; border-top:2px solid #c9a830; }
+
+/* Detail sections */
+.country-section { margin-bottom:24px; page-break-inside:avoid; }
+.country-header {
+  background:#5a3a08; color:#fdf6e3;
+  padding:8px 14px; font-size:13px; font-weight:700;
+  border-radius:6px 6px 0 0;
+  display:flex; justify-content:space-between; align-items:center;
+}
+table.detail-table { width:100%; border-collapse:collapse; }
+table.detail-table thead tr { background:#e8d8a0; }
+table.detail-table thead th { padding:6px 8px; font-size:10px; letter-spacing:0.04em; color:#5a3a08; text-align:left; border-bottom:1px solid #c9a830; }
+table.detail-table tbody td { border-bottom:1px solid #e0d4b0; }
+table.detail-table tbody tr:last-child td { border-bottom:none; }
+
+/* Footer */
+.footer { text-align:center; font-size:10px; color:#aaa; margin-top:28px; border-top:1px solid #ddd; padding-top:10px; }
+.note { font-size:11px; color:#8a6010; font-style:italic; text-align:center; margin:8px 0; }
+
+@media print {
+  body { padding:16px; background:white; }
+  .country-section { page-break-inside:avoid; }
+}
 </style>
 </head>
 <body>
+
 <div class="header">
   <h1>🌍 Commonwealth Explorer</h1>
-  <div class="sub">Résultats d'exploration — généré le ${date}</div>
+  <div class="sub">Bilan de parcours — généré le ${date}</div>
 </div>
+
 <div class="id-box">
   <div>
     <div class="id-code">${S.studentName}</div>
     <div class="id-detail">Classe : ${S.studentClass}</div>
+    <div class="id-detail">${doneCountries} / 5 pays explorés</div>
+  </div>
+  <div style="text-align:center">
+    <div style="font-size:36px">${medal}</div>
   </div>
   <div style="text-align:right">
-    <div style="font-size:18px">${medal}</div>
-    <div class="id-detail">${doneCountries}/5 pays explorés</div>
+    <div class="score-big" style="font-size:28px">${Math.round(S.totalScore||0)} pts</div>
+    <div class="id-detail">sur 900 possibles</div>
+    <div class="id-detail">${totalPct}% de réussite</div>
   </div>
 </div>
-<div class="score-banner">
-  <div class="big">${Math.round(S.totalScore||0)} pts</div>
-  <div class="label">sur 900 possibles · ${totalPct}% de réussite · ${totalCorrect}/${totalQ} bonnes réponses</div>
-</div>
-<table>
+
+<div class="section-title">📊 Résumé par pays</div>
+<table class="summary">
   <thead><tr>
     <th>Pays</th>
-    <th style="text-align:center">Réponses</th>
-    <th style="text-align:center">Taux</th>
+    <th style="text-align:center">Réponses correctes</th>
+    <th style="text-align:center">Taux de réussite</th>
     <th style="text-align:center">Points</th>
     <th style="text-align:center">Statut</th>
   </tr></thead>
-  <tbody>${rows}</tbody>
+  <tbody>${summaryRows}</tbody>
   <tfoot><tr>
     <td>TOTAL</td>
     <td style="text-align:center">${totalCorrect} / ${totalQ}</td>
     <td style="text-align:center">${totalQ>0?totalPct+'%':'—'}</td>
-    <td style="text-align:center;color:#5a3a08">${Math.round(S.totalScore||0)} pts</td>
+    <td style="text-align:center">${Math.round(S.totalScore||0)} pts</td>
     <td style="text-align:center">${doneCountries}/5 pays</td>
   </tr></tfoot>
 </table>
-<div class="note">Document généré depuis Commonwealth Explorer · À remettre au professeur</div>
-<div class="footer">Commonwealth Explorer — Application pédagogique · Données anonymisées</div>
+
+${detailHTML ? '<div class="section-title">📝 Détail des réponses, corrections et score par pays</div>' + detailHTML : ''}
+
+<div class="note">* pts : score partiel pour pays non terminés</div>
+<div class="footer">Commonwealth Explorer — Application pédagogique — Document à remettre au professeur</div>
 </body></html>`;
 
   const win = window.open('', '_blank');
+  if(!win){ alert("Autorisez les fenêtres pop-up pour générer le PDF."); return; }
   win.document.write(pdfHTML);
   win.document.close();
-  // Inject detail sections
-  if(detailSections) {
-    const ph = win.document.getElementById('pdf-detail-placeholder');
-    if(ph) {
-      const h2 = win.document.createElement('h2');
-      h2.style.cssText='font-size:16px;color:#5a3a08;margin:24px 0 10px;border-bottom:2px solid #c9a830;padding-bottom:6px';
-      h2.textContent='Détail des réponses par pays';
-      ph.parentNode.insertBefore(h2, ph);
-      ph.outerHTML = detailSections;
-    }
-  }
-  setTimeout(() => { win.focus(); win.print(); }, 700);
+  setTimeout(() => { win.focus(); win.print(); }, 800);
 }
 
 // ===================== SAVE =====================
@@ -2168,185 +2101,81 @@ function saveProgress(){
     attemptsByCountry:S.attemptsByCountry,
     savedAt:new Date().toISOString()
   };
-  try{localStorage.setItem(key,JSON.stringify(d));}catch(e){}
+  const json = JSON.stringify(d);
+  try{ localStorage.setItem(key, json); } catch(e){}
+  try{ sessionStorage.setItem(key, json); } catch(e){}
+  // Also keep a live backup in window object
+  window._cwSave = window._cwSave || {};
+  window._cwSave[key] = d;
 }
 
 function loadSavedGame(code, classe){
   const key='cw_'+classe+'_'+code;
-  try{
-    const raw=localStorage.getItem(key);
-    if(!raw) return null;
-    return JSON.parse(raw);
-  }catch(e){ return null; }
+  // Try all storage layers
+  try{ const r=localStorage.getItem(key); if(r) return JSON.parse(r); } catch(e){}
+  try{ const r=sessionStorage.getItem(key); if(r) return JSON.parse(r); } catch(e){}
+  if(window._cwSave && window._cwSave[key]) return window._cwSave[key];
+  return null;
 }
 
 function deleteSavedGame(code, classe){
   const key='cw_'+classe+'_'+code;
-  try{ localStorage.removeItem(key); }catch(e){}
+  try{ localStorage.removeItem(key); } catch(e){}
+  try{ sessionStorage.removeItem(key); } catch(e){}
+  if(window._cwSave) delete window._cwSave[key];
 }
 
-// ===================== PROF =====================
-let profData=[], selectedStudent=null, profTab='class';
 
+
+// ===================== PROF =====================
+// ===================== PROF =====================
 function showProf(){
   showScreen('prof');
   loadSessionCodeDisplay();
-  refreshProf();
+  renderProfQA();
 }
 window.showProf = showProf;
 
-function refreshProf(){
-  profData=[];
-  try{
-    Object.keys(localStorage).filter(k=>k.startsWith('cw_')).forEach(k=>{
-      try{profData.push(JSON.parse(localStorage.getItem(k)));}catch(e){}
-    });
-  }catch(e){}
-  if(profData.length===0){
-    profData=[
-      {name:'AL-MA',classe:'2PRO-A',totalScore:512,countryResults:{
-        uk:{score:142,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<10,pts:i<10?14:0,cat:'geo'}))},
-        au:{score:98,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<7,pts:i<7?14:0,cat:'hist'}))},
-        ca:{score:130,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<9,pts:i<9?14:0,cat:'soc'}))},
-        in:{score:142,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<10,pts:i<10?14:0,cat:'mon'}))},
-        nz:{score:0,done:false,details:[]}}},
-      {name:'TH-RO',classe:'2PRO-A',totalScore:284,countryResults:{
-        uk:{score:118,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<8,pts:i<8?14:0,cat:'geo'}))},
-        au:{score:166,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<11,pts:i<11?15:0,cat:'nat'}))},
-        ca:{score:0,done:false,details:[]},in:{score:0,done:false,details:[]},nz:{score:0,done:false,details:[]}}},
-      {name:'LE-DU',classe:'2PRO-B',totalScore:167,countryResults:{
-        uk:{score:167,done:true,details:Array(12).fill(0).map((_,i)=>({correct:i<11,pts:i<11?15:0,cat:'hist'}))},
-        au:{score:0,done:false,details:[]},ca:{score:0,done:false,details:[]},in:{score:0,done:false,details:[]},nz:{score:0,done:false,details:[]}}}
-    ];
-  }
-  switchTab('class');
-}
-
-function switchTab(t){
-  profTab=t;
-  // No tabs visible — show both views stacked
-  renderClass();
-  renderStats();
-}
-
-function renderClass(){
-  const el=document.getElementById('prof-class-view');
-  if(!profData.length){el.innerHTML='<div class="empty-state">Aucun élève enregistré.<br>Les scores apparaîtront après les premières parties sur cet appareil.</div>';return;}
-  let h='<div class="card">';
-  profData.sort((a,b)=>b.totalScore-a.totalScore).forEach((s,rank)=>{
-    const pct=Math.round((s.totalScore||0)/TOTAL_MAX*100);
-    const done=Object.values(s.countryResults||{}).filter(r=>r.done).length;
-    const code=s.name||'??';
-    const initials=code.replace('-','').slice(0,2);
-    const classeLabel=s.classe||'—';
-    const safeId = s.name.replace(/[^a-zA-Z0-9-]/g,'_');
-    h+=`<div class="student-row" id="row-${safeId}">
-      <div class="student-row-main" onclick="selectStudent('${s.name}')">
-        <span class="rank-badge">${rank+1}</span>
-        <div class="avatar">${initials}</div>
-        <div class="stu-prog">
-          <div class="stu-name" style="font-family:'Cinzel',serif;letter-spacing:1px">${code} <span style="font-size:11px;color:var(--text3);font-weight:400;font-family:'Crimson Text',serif">· ${classeLabel}</span></div>
-          <div class="stu-sub">${done}/5 pays · ${pct}% de réussite</div>
-          <div class="mini-prog"><div class="mini-fill" style="width:${pct}%"></div></div>
+function renderProfQA(){
+  const el = document.getElementById('prof-qa-content');
+  if(!el) return;
+  const catNames = {geo:'Géographie',hist:'Histoire',soc:'Société',mon:'Monuments',nat:'Nature'};
+  const catColors = {geo:'tag-geo',hist:'tag-hist',soc:'tag-soc',mon:'tag-mon',nat:'tag-nat'};
+  let h = '';
+  COUNTRIES.forEach(c => {
+    const qs = ALL_Q[c.id] || [];
+    h += `<div style="margin-bottom:1.25rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(160,110,30,0.2)">
+        <span style="font-size:20px">${c.flag}</span>
+        <span style="font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--gold)">${c.name}</span>
+        <span style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3)">${qs.length} questions</span>
+      </div>`;
+    qs.forEach((q, i) => {
+      h += `<div style="margin-bottom:8px;padding:8px 10px;background:rgba(20,12,4,0.6);border-radius:var(--r);border-left:2px solid rgba(160,110,30,0.25)">
+        <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:5px">
+          <span style="font-family:'Special Elite',monospace;font-size:10px;color:var(--text3);min-width:18px;margin-top:2px">${i+1}.</span>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
+              <span class="tag ${catColors[q.c]}">${catNames[q.c]}</span>
+            </div>
+            <div style="font-family:'Crimson Text',serif;font-size:14px;color:var(--text);margin-bottom:4px">${q.q}</div>
+            <div style="font-family:'Crimson Text',serif;font-size:12px;color:var(--text3);font-style:italic;margin-bottom:5px">Indice : ${q.h}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px">
+              ${q.ch.map((ch, ci) =>
+                `<span style="font-size:12px;padding:2px 8px;border-radius:4px;font-family:'Crimson Text',serif;
+                  ${ci === q.a
+                    ? 'background:rgba(40,100,50,0.3);color:#9fdcaa;border:1px solid rgba(60,150,70,0.35);font-weight:600'
+                    : 'background:rgba(20,12,4,0.6);color:var(--text3);border:1px solid rgba(160,110,30,0.15)'}">${ci===q.a?'✓ ':''} ${ch}</span>`
+              ).join('')}
+            </div>
+            <div style="font-family:'Crimson Text',serif;font-size:11px;color:var(--text3);font-style:italic;line-height:1.5;border-top:1px solid rgba(160,110,30,0.1);padding-top:4px">${q.info}</div>
+          </div>
         </div>
-        <div class="stu-score">${Math.round(s.totalScore||0)}</div>
-      </div>
-      <button class="btn-delete" onclick="deleteStudent('${s.name}', event)" title="Supprimer cet élève">🗑</button>
-    </div>`;
-  });
-  h+='</div><p class="note">Cliquer sur un élève pour voir le détail.<br>Les données sont sauvegardées dans le navigateur de cet appareil.</p>';
-  el.innerHTML=h;
-}
-
-function selectStudent(name){
-  selectedStudent=profData.find(s=>s.name===name);
-  // detail tab removed — no navigation needed
-}
-
-function deleteStudent(name, event) {
-  if (event) event.stopPropagation();
-  // Show inline confirm in the row
-  const rowId = 'row-' + CSS.escape(name);
-  const row = document.getElementById(rowId);
-  if (!row) return;
-  const isDemoData = !Object.keys(localStorage).some(k => k.startsWith('cw_') && k !== 'cw_session_code');
-  if (isDemoData) {
-    // Demo mode: just remove from profData array
-    profData = profData.filter(s => s.name !== name);
-    if (selectedStudent && selectedStudent.name === name) selectedStudent = null;
-    renderClass();
-  
-    return;
-  }
-  row.innerHTML = `
-    <div class="delete-confirm" style="width:100%">
-      <div class="delete-confirm-msg">⚠️ Supprimer <strong style="color:#ffaaaa;font-family:'Cinzel',serif">${name}</strong> définitivement ?</div>
-      <div class="delete-confirm-btns">
-        <button class="btn-confirm-yes" onclick="confirmDelete('${name}')">✓ Supprimer</button>
-        <button class="btn-confirm-no" onclick="renderClass()">✕ Annuler</button>
-      </div>
-    </div>`;
-}
-
-function confirmDelete(name) {
-  // Remove from localStorage
-  try {
-    const keys = Object.keys(localStorage).filter(k => k.startsWith('cw_') && k !== 'cw_session_code');
-    keys.forEach(k => {
-      try {
-        const d = JSON.parse(localStorage.getItem(k));
-        if (d && d.name === name) localStorage.removeItem(k);
-      } catch(e) {}
+      </div>`;
     });
-  } catch(e) {}
-  // Remove from profData
-  profData = profData.filter(s => s.name !== name);
-  if (selectedStudent && selectedStudent.name === name) selectedStudent = null;
-  renderClass();
-  if(profTab==='stats') renderStats();
-}
-
-function deleteStudentFromDetail(name) {
-  const el = document.getElementById('detail-delete-confirm');
-  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
-}
-
-
-function renderStats(){
-  const el=document.getElementById('prof-stats-view');
-  if(!profData.length){el.innerHTML='<div class="empty-state">Aucune donnée disponible.</div>';return;}
-  const avg=Math.round(profData.reduce((s,p)=>s+(p.totalScore||0),0)/profData.length);
-  const allD=profData.flatMap(p=>Object.values(p.countryResults||{}).flatMap(r=>r.details||[]));
-  const gPct=allD.length?Math.round(allD.filter(d=>d.correct).length/allD.length*100):0;
-  const finished=profData.filter(p=>Object.values(p.countryResults||{}).filter(r=>r.done).length===5).length;
-  let h=`<div class="card">
-    <div class="stat-grid" style="margin-bottom:1rem">
-      <div class="stat-box"><div class="stat-val">${profData.length}</div><div class="stat-lbl">Élèves</div></div>
-      <div class="stat-box"><div class="stat-val">${avg}</div><div class="stat-lbl">Score moyen</div></div>
-      <div class="stat-box"><div class="stat-val">${gPct}%</div><div class="stat-lbl">Taux réussite</div></div>
-    </div>
-    <div class="section-title">Avancement de la classe :</div>`;
-  COUNTRIES.forEach(c=>{
-    const played=profData.filter(p=>p.countryResults?.[c.id]?.done).length;
-    const p=profData.length?Math.round(played/profData.length*100):0;
-    h+=`<div class="cp-row"><span class="cp-flag">${c.flag}</span><span class="cp-name">${c.name}</span>
-      <div class="cp-bar-wrap"><div class="cp-bar" style="width:${p}%;background:var(--green)"></div></div>
-      <span class="cp-pts">${played}/${profData.length} élèves</span></div>`;
+    h += '</div>';
   });
-  const catMap={geo:'Géographie',hist:'Histoire',soc:'Société',mon:'Monuments',nat:'Nature'};
-  h+='<div class="section-title">Thèmes (taux de réussite classe) :</div>';
-  ['geo','hist','soc','mon','nat'].forEach(cat=>{
-    const cq=allD.filter(d=>d.cat===cat); if(!cq.length) return;
-    const p=Math.round(cq.filter(d=>d.correct).length/cq.length*100);
-    const color=p>=70?'var(--green)':p>=50?'var(--amber)':'var(--red)';
-    h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-      <span style="font-size:13px;color:var(--text2);min-width:90px">${catMap[cat]}</span>
-      <div class="cp-bar-wrap" style="flex:1"><div class="cp-bar" style="width:${p}%;background:${color}"></div></div>
-      <span style="font-size:12px;color:var(--text2);min-width:35px">${p}%</span></div>`;
-  });
-  if(finished>0) h+=`<div class="fb fb-ok" style="margin-top:0.75rem;font-size:13px">🏆 ${finished} élève(s) ont terminé les 5 pays !</div>`;
-  h+='</div>';
-  el.innerHTML=h;
+  el.innerHTML = h;
 }
 
 // Add twinkling stars to passport banner
