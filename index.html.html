@@ -1058,6 +1058,9 @@ input[type=text]::placeholder { color: var(--text3); font-style: italic; }
       <div class="name-icon">🧭</div>
       <h2 style="font-size:20px;margin-bottom:6px">Identification de l'explorateur</h2>
       <p style="font-size:13px;color:var(--text2);line-height:1.6">Utilise uniquement les <strong style="color:var(--green)">2 premières lettres de ton prénom</strong> et les <strong style="color:var(--green)">2 premières lettres de ton nom</strong>.<br>Aucune donnée personnelle n'est enregistrée.</p>
+    <div id="ls-warning" style="display:none;margin-top:10px;background:rgba(180,80,20,0.15);border:1px solid rgba(220,110,30,0.35);border-radius:var(--r);padding:8px 12px;font-family:'Crimson Text',serif;font-size:13px;color:var(--amber)">
+      ⚠️ La sauvegarde est désactivée en mode navigation privée. Ta progression ne sera pas conservée entre les sessions.
+    </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">
       <div>
@@ -1636,7 +1639,8 @@ function doResetSaved(){
 }
 
 function buildMap(){
-  console.log('[CWE] buildMap called. countryResults:', JSON.stringify(S.countryResults));
+  const doneList = COUNTRIES.map(c=>(S.countryResults[c.id]||{}).done===true ? c.id : null).filter(Boolean);
+  console.log('[CWE] buildMap — pays terminés:', doneList, '— totalScore:', S.totalScore);
   document.getElementById('map-name').textContent = S.studentName+' · '+S.studentClass;
   document.getElementById('map-score-pill').textContent = Math.round(S.totalScore)+' pts';
   const g = document.getElementById('world-grid'); g.innerHTML='';
@@ -2090,6 +2094,10 @@ ${detailHTML ? '<div class="section-title">📝 Détail des réponses, correctio
 }
 
 // ===================== SAVE =====================
+function lsAvailable(){
+  try{ localStorage.setItem('_cwtest','1'); localStorage.removeItem('_cwtest'); return true; } catch(e){ return false; }
+}
+
 function saveProgress(){
   if(!S.studentName) return;
   const key='cw_'+S.studentClass+'_'+S.studentName;
@@ -2102,27 +2110,46 @@ function saveProgress(){
     savedAt:new Date().toISOString()
   };
   const json = JSON.stringify(d);
-  try{ localStorage.setItem(key, json); } catch(e){}
-  try{ sessionStorage.setItem(key, json); } catch(e){}
-  // Also keep a live backup in window object
+  // localStorage = seul stockage persistant entre sessions
+  if(lsAvailable()){
+    localStorage.setItem(key, json);
+    console.log('[CWE] saveProgress OK — clé:', key, '— pays done:', Object.values(S.countryResults).filter(r=>r.done===true).map(r=>r).length);
+  } else {
+    console.warn('[CWE] localStorage indisponible (mode privé ?) — sauvegarde impossible');
+  }
+  // Backup mémoire vive pour la session en cours
   window._cwSave = window._cwSave || {};
   window._cwSave[key] = d;
 }
 
 function loadSavedGame(code, classe){
   const key='cw_'+classe+'_'+code;
-  // Try all storage layers
-  try{ const r=localStorage.getItem(key); if(r) return JSON.parse(r); } catch(e){}
-  try{ const r=sessionStorage.getItem(key); if(r) return JSON.parse(r); } catch(e){}
-  if(window._cwSave && window._cwSave[key]) return window._cwSave[key];
+  console.log('[CWE] loadSavedGame — clé recherchée:', key);
+  // 1. localStorage (persistant entre sessions)
+  if(lsAvailable()){
+    try{
+      const r=localStorage.getItem(key);
+      if(r){
+        const parsed=JSON.parse(r);
+        console.log('[CWE] Sauvegarde trouvée dans localStorage:', parsed.savedAt);
+        return parsed;
+      }
+    } catch(e){ console.warn('[CWE] Erreur lecture localStorage:', e); }
+  }
+  // 2. Backup RAM (même session seulement)
+  if(window._cwSave && window._cwSave[key]){
+    console.log('[CWE] Sauvegarde trouvée en RAM');
+    return window._cwSave[key];
+  }
+  console.log('[CWE] Aucune sauvegarde trouvée pour', key);
   return null;
 }
 
 function deleteSavedGame(code, classe){
   const key='cw_'+classe+'_'+code;
-  try{ localStorage.removeItem(key); } catch(e){}
-  try{ sessionStorage.removeItem(key); } catch(e){}
+  if(lsAvailable()) try{ localStorage.removeItem(key); } catch(e){}
   if(window._cwSave) delete window._cwSave[key];
+  console.log('[CWE] Sauvegarde supprimée pour', key);
 }
 
 
@@ -2180,6 +2207,14 @@ function renderProfQA(){
 
 // Add twinkling stars to passport banner
 document.addEventListener('DOMContentLoaded', () => {
+  // Vérifier localStorage au démarrage
+  if(!lsAvailable()){
+    const w=document.getElementById('ls-warning');
+    if(w) w.style.display='block';
+    console.warn('[CWE] localStorage indisponible — mode privé détecté');
+  } else {
+    console.log('[CWE] localStorage disponible — sauvegarde activée');
+  }
   const banner = document.querySelector('.passport-anim');
   if (!banner) return;
   for (let i = 0; i < 18; i++) {
